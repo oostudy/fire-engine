@@ -92,7 +92,7 @@ cc.Scene = cc.Class({
 
             // deactivate ActionManager and EventManager by default
             cc.director.getActionManager().pauseTarget(this);
-            cc.eventManager.pauseTarget(this);
+            // cc.eventManager.pauseTarget(this);
 
             var children = this._children;
             for (var i = 0, len = children.length; i < len; i++) {

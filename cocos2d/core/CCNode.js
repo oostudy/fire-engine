@@ -543,7 +543,7 @@ var Node = cc.Class({
             this._mouseListener.mask = null;
             this._mouseListener = null;
         }
-        cc.eventManager.removeListeners(this);
+        // cc.eventManager.removeListeners(this);
         for (i = 0, len = this.__eventTargets.length; i < len; ++i) {
             var target = this.__eventTargets[i];
             target && target.targetOff(this);
@@ -916,7 +916,7 @@ var Node = cc.Class({
         if ( !this._activeInHierarchy ) {
             // deactivate ActionManager and EventManager by default
             cc.director.getActionManager().pauseTarget(this);
-            cc.eventManager.pauseTarget(this);
+            // cc.eventManager.pauseTarget(this);
         }
 
         var children = this._children;
@@ -994,7 +994,7 @@ var Node = cc.Class({
         if (newActive) {
             // activate
             cc.director.getActionManager().resumeTarget(this);
-            cc.eventManager.resumeTarget(this);
+            // cc.eventManager.resumeTarget(this);
             if (this._touchListener) {
                 this._touchListener.mask = _searchMaskParent(this);
             }
@@ -1005,7 +1005,7 @@ var Node = cc.Class({
         else {
             // deactivate
             cc.director.getActionManager().pauseTarget(this);
-            cc.eventManager.pauseTarget(this);
+            // cc.eventManager.pauseTarget(this);
         }
 
         //
@@ -1156,7 +1156,7 @@ var Node = cc.Class({
                 if (CC_JSB) {
                     this._touchListener.retain();
                 }
-                cc.eventManager.addListener(this._touchListener, this);
+                // cc.eventManager.addListener(this._touchListener, this);
                 newAdded = true;
             }
         }
@@ -1175,14 +1175,14 @@ var Node = cc.Class({
                 if (CC_JSB) {
                     this._mouseListener.retain();
                 }
-                cc.eventManager.addListener(this._mouseListener, this);
+                // cc.eventManager.addListener(this._mouseListener, this);
                 newAdded = true;
             }
         }
         if (newAdded && !this._activeInHierarchy) {
             cc.director.getScheduler().schedule(function() {
                 if (!this._activeInHierarchy) {
-                    cc.eventManager.pauseTarget(this);
+                    // cc.eventManager.pauseTarget(this);
                 }
             }, this, 0, 0, 0, false);
         }
@@ -1242,7 +1242,7 @@ var Node = cc.Class({
                 }
             }
 
-            cc.eventManager.removeListener(this._touchListener);
+            // cc.eventManager.removeListener(this._touchListener);
             this._touchListener = null;
         }
     },
@@ -1258,7 +1258,7 @@ var Node = cc.Class({
                 _currentHovered = null;
             }
 
-            cc.eventManager.removeListener(this._mouseListener);
+            // cc.eventManager.removeListener(this._mouseListener);
             this._mouseListener = null;
         }
     },
@@ -1456,41 +1456,6 @@ var Node = cc.Class({
     },
 
 });
-
-// In JSB, when inner sg node being replaced, the system event listeners will be cleared.
-// We need a mechanisme to guarentee the persistence of system event listeners.
-if (CC_JSB) {
-    var updateListeners = function () {
-        if (!this._activeInHierarchy) {
-            cc.eventManager.pauseTarget(this);
-        }
-    };
-
-    cc.js.getset(Node.prototype, '_sgNode',
-        function () {
-            return this.__sgNode;
-        },
-        function (value) {
-            this.__sgNode = value;
-            if (this._touchListener || this._mouseListener) {
-                if (this._touchListener) {
-                    this._touchListener.retain();
-                    cc.eventManager.removeListener(this._touchListener);
-                    cc.eventManager.addListener(this._touchListener, this);
-                    this._touchListener.release();
-                }
-                if (this._mouseListener) {
-                    this._mouseListener.retain();
-                    cc.eventManager.removeListener(this._mouseListener);
-                    cc.eventManager.addListener(this._mouseListener, this);
-                    this._mouseListener.release();
-                }
-                cc.director.once(cc.Director.EVENT_BEFORE_UPDATE, updateListeners, this);
-            }
-        },
-        true
-    );
-}
 
 /**
  * @event position-changed

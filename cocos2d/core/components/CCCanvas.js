@@ -133,18 +133,7 @@ var Canvas = cc.Class({
     },
 
     ctor: function () {
-        if (CC_JSB) {
-            this._thisOnResized = cc.EventListener.create({
-                event: cc.EventListener.CUSTOM,
-                eventName: "window-resize",
-                callback: this.onResized.bind(this)
-            });
-
-            this._thisOnResized.retain();
-        }
-        else {
-            this._thisOnResized = this.onResized.bind(this);
-        }
+        this._thisOnResized = this.onResized.bind(this);
     },
 
     __preload: function () {
@@ -176,21 +165,6 @@ var Canvas = cc.Class({
 
         cc.director.on(cc.Director.EVENT_BEFORE_VISIT, this.alignWithScreen, this);
 
-        if (CC_EDITOR) {
-            cc.engine.on('design-resolution-changed', this._thisOnResized);
-        }
-        else if (!CC_JSB) {
-            if (cc.sys.isMobile) {
-                window.addEventListener('resize', this._thisOnResized);
-            }
-            else {
-                cc.eventManager.addCustomListener('canvas-resize', this._thisOnResized);
-            }
-        }
-        else {
-            cc.eventManager.addListener(this._thisOnResized, 1);
-        }
-
         this.applySettings();
         this.onResized();
     },
@@ -201,22 +175,6 @@ var Canvas = cc.Class({
         }
 
         cc.director.off(cc.Director.EVENT_BEFORE_VISIT, this.alignWithScreen, this);
-
-        if (CC_EDITOR) {
-            cc.engine.off('design-resolution-changed', this._thisOnResized);
-        }
-        else if (!CC_JSB) {
-            if (cc.sys.isMobile) {
-                window.removeEventListener('resize', this._thisOnResized);
-            }
-            else {
-                cc.eventManager.removeCustomListeners('canvas-resize', this._thisOnResized);
-            }
-        }
-        else {
-            cc.eventManager.removeListener(this._thisOnResized);
-            this._thisOnResized.release();
-        }
 
         if (Canvas.instance === this) {
             Canvas.instance = null;

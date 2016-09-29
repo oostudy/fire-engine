@@ -81,7 +81,7 @@ cc.SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
                         // just packing
                         return;
                     }
-                    this._loadTexture();
+                    // this._loadTexture();
                 }
             }
         }
@@ -279,71 +279,6 @@ cc.SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
     },
 
     /**
-     * !#en Sets the texture of the frame, the texture is retained automatically.
-     * !#zh 设置使用的纹理实例，会被 retain。
-     * @method _refreshTexture
-     * @param {Texture2D} texture
-     */
-    _refreshTexture: function (texture) {
-        var self = this;
-        if (self._texture !== texture) {
-            var locLoaded = texture.isLoaded();
-            this._textureLoaded = locLoaded;
-            this._texture = texture;
-            function textureLoadedCallback () {
-                self._textureLoaded = true;
-                var w = texture.width, h = texture.height;
-
-                if (self._rotated && cc._renderType === cc.game.RENDER_TYPE_CANVAS) {
-                    var tempElement = texture.getHtmlElementObj();
-                    tempElement = _ccsg.Sprite.CanvasRenderCmd._cutRotateImageToCanvas(tempElement, self.getRect());
-                    var tempTexture = new cc.Texture2D();
-                    tempTexture.initWithElement(tempElement);
-                    tempTexture.handleLoadedTexture();
-                    self._texture = tempTexture;
-                    self._rotated = false;
-                    w = self._texture.width;
-                    h = self._texture.height;
-                    self.setRect(cc.rect(0, 0, w, h));
-                }
-
-                if (self._rect) {
-                    self._checkRect(self._texture);
-                }
-                else {
-                    self.setRect(cc.rect(0, 0, w, h));
-                }
-
-                if (!self._originalSize) {
-                    self.setOriginalSize(cc.size(w, h));
-                }
-
-                if (!self._offset) {
-                    self.setOffset(cc.v2(0, 0));
-                }
-
-                //dispatch 'load' event of cc.SpriteFrame
-                self.emit("load");
-            }
-
-            if (locLoaded) {
-                textureLoadedCallback();
-            }
-            else {
-                texture.once("load", textureLoadedCallback);
-            }
-        }
-        //if (texture && texture.url && texture.isLoaded()) {
-        //    if (self._rect) {
-        //        self._checkRect(texture);
-        //    }
-        //    else {
-        //        self.setRect(cc.rect(0, 0, texture.width, texture.height));
-        //    }
-        //}
-    },
-
-    /**
      * !#en Returns the offset of the frame in the texture.
      * !#zh 获取偏移量
      * @method getOffset
@@ -414,20 +349,13 @@ cc.SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
             this._textureFilename = texture;
             this._loadTexture();
         }
-        else if (texture instanceof cc.Texture2D) {
-            this._refreshTexture(texture);
-        }
-        else {
-            //todo log error
-        }
 
         return true;
     },
 
     _loadTexture: function () {
         if (this._textureFilename) {
-            var texture = cc.textureCache.addImage(this._textureFilename);
-            this._refreshTexture(texture);
+            this._textureLoaded = true;
         }
     },
 

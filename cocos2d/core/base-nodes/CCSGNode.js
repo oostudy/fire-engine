@@ -339,7 +339,7 @@ _ccsg.Node = cc.Class({
         this._localZOrder = localZOrder;
         if (this._parent)
             this._parent.reorderChild(this, localZOrder);
-        cc.eventManager._setDirtyForNode(this);
+        // cc.eventManager._setDirtyForNode(this);
     },
 
     //Helper function used by `setLocalZOrder`. Don't use it unless you know what you are doing.
@@ -404,7 +404,7 @@ _ccsg.Node = cc.Class({
     setGlobalZOrder: function (globalZOrder) {
         if (this._globalZOrder !== globalZOrder) {
             this._globalZOrder = globalZOrder;
-            cc.eventManager._setDirtyForNode(this);
+            // cc.eventManager._setDirtyForNode(this);
         }
     },
 
@@ -1058,7 +1058,7 @@ _ccsg.Node = cc.Class({
         this.unscheduleAllCallbacks();
 
         // event
-        cc.eventManager.removeListeners(this);
+        // cc.eventManager.removeListeners(this);
 
         // timers
         this._arrayMakeObjectsPerformSelector(this._children, _ccsg.Node._stateCallbackType.cleanup);
@@ -1661,7 +1661,7 @@ _ccsg.Node = cc.Class({
     resume: function () {
         this.scheduler.resumeTarget(this);
         this.actionManager && this.actionManager.resumeTarget(this);
-        cc.eventManager.resumeTarget(this);
+        // cc.eventManager.resumeTarget(this);
     },
 
     /**
@@ -1683,7 +1683,7 @@ _ccsg.Node = cc.Class({
     pause: function () {
         this.scheduler.pauseTarget(this);
         this.actionManager && this.actionManager.pauseTarget(this);
-        cc.eventManager.pauseTarget(this);
+        // cc.eventManager.pauseTarget(this);
     },
 
     /**

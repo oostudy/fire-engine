@@ -33,6 +33,11 @@ function loadNothing (item, callback) {
 }
 
 function loadJSON (item, callback) {
+    if (typeof item.content === 'object') {
+        callback(null, item.content);
+        return;
+    }
+    
     if (typeof item.content !== 'string') {
         callback( new Error('JSON Loader: Input item doesn\'t contain string content') );
     }
@@ -47,16 +52,16 @@ function loadJSON (item, callback) {
 }
 
 function loadImage (item, callback) {
-    if (!(item.content instanceof Image)) {
-        callback( new Error('Image Loader: Input item doesn\'t contain Image content') );
-    }
+    // if (!(item.content instanceof Image)) {
+    //     callback( new Error('Image Loader: Input item doesn\'t contain Image content') );
+    // }
     var url = item.url;
-    var tex = cc.textureCache.getTextureForKey(url) || new Texture2D();
-    tex.url = url;
-    tex.initWithElement(item.content);
-    tex.handleLoadedTexture();
-    cc.textureCache.cacheImage(url, tex);
-    callback(null, tex);
+    // var tex = cc.textureCache.getTextureForKey(url) || new Texture2D();
+    // tex.url = url;
+    // tex.initWithElement(item.content);
+    // tex.handleLoadedTexture();
+    // cc.textureCache.cacheImage(url, tex);
+    callback(null, url);
 }
 
 function loadPlist (item, callback) {

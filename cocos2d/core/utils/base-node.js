@@ -26,16 +26,13 @@
 var SgHelper = require('./scene-graph-helper');
 var Destroying = require('../platform/CCObject').Flags.Destroying;
 var Misc = require('./misc');
-var DirtyFlags = Misc.DirtyFlags;
 var IdGenerater = require('../platform/id-generater');
 
 function updateOrder (node) {
     var parent = node._parent;
     parent._reorderChildDirty = true;
     parent._delaySort();
-    if (!CC_JSB) {
-        cc.eventManager._setDirtyForNode(node);
-    }
+    // cc.eventManager._setDirtyForNode(node);
 }
 
 var POSITION_CHANGED = 'position-changed';
@@ -757,7 +754,7 @@ var BaseNode = cc.Class(/** @lends cc.Node# */{
                 _ccsg.Node.prototype.onEnter.call(this);
                 if (this._entity && !this._entity._active) {
                     cc.director.getActionManager().pauseTarget(this);
-                    cc.eventManager.pauseTarget(this);
+                    // cc.eventManager.pauseTarget(this);
                 }
             };
         }
@@ -792,12 +789,7 @@ var BaseNode = cc.Class(/** @lends cc.Node# */{
     },
 
     _onPreDestroy: function () {
-        if (CC_JSB) {
-            this._sgNode.release();
-            this._sgNode._entity = null;
-            this._sgNode = null;
-        }
-        cc.eventManager.removeListeners(this);
+        // cc.eventManager.removeListeners(this);
         for (var i = 0, len = this.__eventTargets.length; i < len; ++i) {
             var target = this.__eventTargets[i];
             target && target.targetOff(this);
@@ -1188,7 +1180,7 @@ var BaseNode = cc.Class(/** @lends cc.Node# */{
         // actions
         cc.director.getActionManager().removeAllActionsFromTarget(this);
         // event
-        cc.eventManager.removeListeners(this);
+        // cc.eventManager.removeListeners(this);
 
         // children
         var i, len = this._children.length, node;
@@ -1878,16 +1870,8 @@ var BaseNode = cc.Class(/** @lends cc.Node# */{
             var siblings = parent._children;
             for (var i = 0, len = siblings.length; i < len; i++) {
                 var sibling = siblings[i]._sgNode;
-                if (CC_JSB) {
-                    // Reset zorder to update their arrival order
-                    var zOrder = sibling.getLocalZOrder();
-                    sibling.setLocalZOrder(zOrder+1);
-                    sibling.setLocalZOrder(zOrder);
-                }
-                else {
-                    sibling._arrivalOrder = i;
-                    cc.eventManager._setDirtyForNode(siblings[i]);
-                }
+                sibling._arrivalOrder = i;
+                // cc.eventManager._setDirtyForNode(siblings[i]);
             }
             if (!CC_JSB) {
                 cc.renderer.childrenOrderDirty = true;
@@ -1999,11 +1983,11 @@ var BaseNode = cc.Class(/** @lends cc.Node# */{
         // update ActionManager and EventManager because sgNode maybe changed
         if (this._activeInHierarchy) {
             cc.director.getActionManager().resumeTarget(this);
-            cc.eventManager.resumeTarget(this);
+            // cc.eventManager.resumeTarget(this);
         }
         else {
             cc.director.getActionManager().pauseTarget(this);
-            cc.eventManager.pauseTarget(this);
+            // cc.eventManager.pauseTarget(this);
         }
     },
 
@@ -2045,11 +2029,11 @@ var BaseNode = cc.Class(/** @lends cc.Node# */{
 
         if (this._activeInHierarchy) {
             cc.director.getActionManager().resumeTarget(this);
-            cc.eventManager.resumeTarget(this);
+            // cc.eventManager.resumeTarget(this);
         }
         else {
             cc.director.getActionManager().pauseTarget(this);
-            cc.eventManager.pauseTarget(this);
+            // cc.eventManager.pauseTarget(this);
         }
     },
 

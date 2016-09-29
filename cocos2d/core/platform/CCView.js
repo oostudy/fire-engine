@@ -154,7 +154,6 @@ var View = cc._Class.extend({
         if (width > 0)
             view.setDesignResolutionSize(width, height, view._resolutionPolicy);
 
-        cc.eventManager.dispatchCustomEvent('canvas-resize');
         if (view._resizeCallback) {
             view._resizeCallback.call();
         }

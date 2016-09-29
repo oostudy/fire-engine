@@ -148,7 +148,8 @@ cc.rendererCanvas = {
         var dirtyRegion = this._dirtyRegion = this._dirtyRegion || new cc.DirtyRegion();
         var viewport = cc.view._frameSize;
         var wrapper = ctxWrapper || cc._renderContext;
-        var ctx = wrapper.getContext();
+        var ctx = wx.createContext();
+        wrapper._context = ctx;
 
         var scaleX = cc.view.getScaleX(),
             scaleY = cc.view.getScaleY();
@@ -312,6 +313,16 @@ cc.rendererCanvas = {
 
     proto.getContext = function(){
         return this._context;
+    };
+
+    proto.save = function () {
+        this._context.save();
+        this._saveCount++;
+    };
+
+    proto.restore = function () {
+        this._context.restore();
+        this._saveCount--;
     };
 
     proto.setGlobalAlpha = function (alpha) {

@@ -47,41 +47,42 @@ function downloadScript (item, callback, isAsync) {
 }
 
 function downloadImage (item, callback, isCrossOrigin) {
-    if (isCrossOrigin === undefined) {
-        isCrossOrigin = true;
-    }
+    // if (isCrossOrigin === undefined) {
+    //     isCrossOrigin = true;
+    // }
 
-    var url = urlAppendTimestamp(item.url);
-    var img = new Image();
+    // var url = urlAppendTimestamp(item.url);
+    // var img = new Image();
 
-    if (img.complete && img.naturalWidth > 0) {
-        callback(null, img);
-    }
-    else {
-        function loadCallback () {
-            img.removeEventListener('load', loadCallback);
-            img.removeEventListener('error', errorCallback);
+    // if (img.complete && img.naturalWidth > 0) {
+    //     callback(null, img);
+    // }
+    // else {
+    //     function loadCallback () {
+    //         img.removeEventListener('load', loadCallback);
+    //         img.removeEventListener('error', errorCallback);
 
-            if (callback) {
-                callback(null, img);
-            }
-        }
-        function errorCallback () {
-            img.removeEventListener('load', loadCallback);
-            img.removeEventListener('error', errorCallback);
+    //         if (callback) {
+    //             callback(null, img);
+    //         }
+    //     }
+    //     function errorCallback () {
+    //         img.removeEventListener('load', loadCallback);
+    //         img.removeEventListener('error', errorCallback);
 
-            if (img.crossOrigin && img.crossOrigin.toLowerCase() === 'anonymous') {
-                downloadImage(item, callback, false);
-            }
-            else {
-                callback('Load image (' + url + ') failed');
-            }
-        }
+    //         if (img.crossOrigin && img.crossOrigin.toLowerCase() === 'anonymous') {
+    //             downloadImage(item, callback, false);
+    //         }
+    //         else {
+    //             callback('Load image (' + url + ') failed');
+    //         }
+    //     }
 
-        img.addEventListener('load', loadCallback);
-        img.addEventListener('error', errorCallback);
-    }
-    img.src = url;
+    //     img.addEventListener('load', loadCallback);
+    //     img.addEventListener('error', errorCallback);
+    // }
+    // img.src = url;
+    callback(null, item.url);
 }
 
 function downloadFont (item, callback) {
@@ -98,6 +99,11 @@ function downloadFont (item, callback) {
         name = cc.path.basename(url, type);
     }
     callback(null, null);
+}
+
+function downloadJson (item, callback) {
+    var json = require(item.url + '.js');
+    callback(null, json);
 }
 
 function downloadUuid (item, callback) {
@@ -173,7 +179,7 @@ var defaultMap = {
     'tmx' : downloadText,
     'tsx' : downloadText,
 
-    'json' : downloadText,
+    'json' : downloadJson,
     'ExportJson' : downloadText,
     'plist' : downloadText,
 

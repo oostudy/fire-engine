@@ -614,19 +614,3 @@ proto.setShaderProgram = function (shaderProgram) {
 proto.getShaderProgram = function () {
     return null;
 };
-
-//util functions
-_ccsg.Node.CanvasRenderCmd._getCompositeOperationByBlendFunc = function (blendFunc) {
-    if (!blendFunc)
-        return "source-over";
-    else {
-        if (( blendFunc.src === cc.macro.SRC_ALPHA && blendFunc.dst === cc.macro.ONE) || (blendFunc.src === cc.macro.ONE && blendFunc.dst === cc.macro.ONE))
-            return "lighter";
-        else if (blendFunc.src === cc.macro.ZERO && blendFunc.dst === cc.macro.SRC_ALPHA)
-            return "destination-in";
-        else if (blendFunc.src === cc.macro.ZERO && blendFunc.dst === cc.macro.ONE_MINUS_SRC_ALPHA)
-            return "destination-out";
-        else
-            return "source-over";
-    }
-};

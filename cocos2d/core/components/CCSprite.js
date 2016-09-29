@@ -329,7 +329,7 @@ var Sprite = cc.Class({
             set: function(value) {
                 this._srcBlendFactor = value;
                 this._blendFunc.src = value;
-                this._sgNode.setBlendFunc(this._blendFunc);
+                // this._sgNode.setBlendFunc(this._blendFunc);
             },
             animatable: false,
             type:BlendFactor,
@@ -351,7 +351,7 @@ var Sprite = cc.Class({
             set: function(value) {
                 this._dstBlendFactor = value;
                 this._blendFunc.dst = value;
-                this._sgNode.setBlendFunc(this._blendFunc);
+                // this._sgNode.setBlendFunc(this._blendFunc);
             },
             animatable: false,
             type: BlendFactor,
@@ -555,13 +555,7 @@ var Sprite = cc.Class({
 
         var spriteFrame = this._spriteFrame;
         if (spriteFrame) {
-            if (spriteFrame.textureLoaded()) {
-                this._onSpriteFrameLoaded(null);
-            }
-            else {
-                spriteFrame.once('load', this._onSpriteFrameLoaded, this);
-                spriteFrame.ensureLoadTexture();
-            }
+            this._onSpriteFrameLoaded(null);
         }
         else {
             sgNode.setVisible(false);
@@ -594,7 +588,7 @@ var Sprite = cc.Class({
         sgNode.enableTrimmedContentSize(this._isTrimmedMode);
         this._blendFunc.src = this._srcBlendFactor;
         this._blendFunc.dst = this._dstBlendFactor;
-        sgNode.setBlendFunc(this._blendFunc);
+        // sgNode.setBlendFunc(this._blendFunc);
     },
 
     _resized: CC_EDITOR && function () {
