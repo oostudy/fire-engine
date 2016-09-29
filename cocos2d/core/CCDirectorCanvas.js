@@ -51,8 +51,8 @@ cc.game.once(cc.game.EVENT_RENDERER_INITED, function () {
 
         _p.setOpenGLView = function (openGLView) {
             // set size
-            this._winSizeInPoints.width = cc._canvas.width;      //this._openGLView.getDesignResolutionSize();
-            this._winSizeInPoints.height = cc._canvas.height;
+            this._winSizeInPoints.width = cc.sys.windowPixelResolution.width;      //this._openGLView.getDesignResolutionSize();
+            this._winSizeInPoints.height = cc.sys.windowPixelResolution.height;
             this._openGLView = openGLView || cc.view;
             if (cc.eventManager)
                 cc.eventManager.setEnabled(true);

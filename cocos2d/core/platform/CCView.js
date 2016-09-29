@@ -25,71 +25,20 @@
  ****************************************************************************/
 
 var __BrowserGetter = {
+
     init: function(){
-        this.html = document.getElementsByTagName("html")[0];
     },
     availWidth: function(frame){
-        if(!frame || frame === this.html)
-            return window.innerWidth;
-        else
-            return frame.clientWidth;
+        return cc.sys.windowPixelResolution.width;
     },
     availHeight: function(frame){
-        if(!frame || frame === this.html)
-            return window.innerHeight;
-        else
-            return frame.clientHeight;
+        return cc.sys.windowPixelResolution.height;
     },
     meta: {
         "width": "device-width"
     },
     adaptationType: cc.sys.browserType
 };
-
-if(window.navigator.userAgent.indexOf("OS 8_1_") > -1) //this mistake like MIUI, so use of MIUI treatment method
-    __BrowserGetter.adaptationType = cc.sys.BROWSER_TYPE_MIUI;
-
-if(cc.sys.os === cc.sys.OS_IOS) // All browsers are WebView
-    __BrowserGetter.adaptationType = cc.sys.BROWSER_TYPE_SAFARI;
-
-switch(__BrowserGetter.adaptationType){
-    case cc.sys.BROWSER_TYPE_SAFARI:
-        __BrowserGetter.meta["minimal-ui"] = "true";
-        __BrowserGetter.availWidth = function(frame){
-            return frame.clientWidth;
-        };
-        __BrowserGetter.availHeight = function(frame){
-            return frame.clientHeight;
-        };
-        break;
-    case cc.sys.BROWSER_TYPE_CHROME:
-        __BrowserGetter.__defineGetter__("target-densitydpi", function(){
-            return cc.view._targetDensityDPI;
-        });
-    case cc.sys.BROWSER_TYPE_SOUGOU:
-    case cc.sys.BROWSER_TYPE_UC:
-        __BrowserGetter.availWidth = function(frame){
-            return frame.clientWidth;
-        };
-        __BrowserGetter.availHeight = function(frame){
-            return frame.clientHeight;
-        };
-        break;
-    case cc.sys.BROWSER_TYPE_MIUI:
-        __BrowserGetter.init = function(view){
-            if(view.__resizeWithBrowserSize) return;
-            var resize = function(){
-                view.setDesignResolutionSize(
-                    view._designResolutionSize.width,
-                    view._designResolutionSize.height,
-                    view._resolutionPolicy
-                );
-                window.removeEventListener("resize", resize, false);
-            };
-            window.addEventListener("resize", resize, false);
-        };
-        break;
-}
 
 var _scissorRect = cc.rect();
 
@@ -164,7 +113,7 @@ var View = cc._Class.extend({
         _t._frameSize = cc.size(0, 0);
         _t._initFrameSize();
 
-        var w = cc.game.canvas.width, h = cc.game.canvas.height;
+        var w = cc.sys.windowPixelResolution.width, h = cc.sys.windowPixelResolution.height;
         _t._designResolutionSize = cc.size(w, h);
         _t._originalDesignResolutionSize = cc.size(w, h);
         _t._viewPortRect = cc.rect(0, 0, w, h);
@@ -172,8 +121,6 @@ var View = cc._Class.extend({
         _t._contentTranslateLeftTop = {left: 0, top: 0};
         _t._viewName = "Cocos2dHTML5";
 
-        var sys = cc.sys;
-        _t.enableRetina(sys.os === sys.OS_IOS || sys.os === sys.OS_OSX);
         cc.visibleRect && cc.visibleRect.init(_t._visibleRect);
 
         // Setup system default resolution policies
@@ -184,7 +131,6 @@ var View = cc._Class.extend({
         _t._rpFixedWidth = new cc.ResolutionPolicy(_strategyer.EQUAL_TO_FRAME, _strategy.FIXED_WIDTH);
 
         _t._targetDensityDPI = cc.macro.DENSITYDPI_HIGH;
-        _t.enableAntiAlias(true);
     },
 
     // Resize helper functions
@@ -253,21 +199,21 @@ var View = cc._Class.extend({
      * @param {Boolean} enabled - Whether enable automatic resize with browser's resize event
      */
     resizeWithBrowserSize: function (enabled) {
-        if (enabled) {
-            //enable
-            if (!this.__resizeWithBrowserSize) {
-                this.__resizeWithBrowserSize = true;
-                window.addEventListener('resize', this._resizeEvent);
-                window.addEventListener('orientationchange', this._orientationChange);
-            }
-        } else {
-            //disable
-            if (this.__resizeWithBrowserSize) {
-                this.__resizeWithBrowserSize = false;
-                window.removeEventListener('resize', this._resizeEvent);
-                window.removeEventListener('orientationchange', this._orientationChange);
-            }
-        }
+        // if (enabled) {
+        //     //enable
+        //     if (!this.__resizeWithBrowserSize) {
+        //         this.__resizeWithBrowserSize = true;
+        //         window.addEventListener('resize', this._resizeEvent);
+        //         window.addEventListener('orientationchange', this._orientationChange);
+        //     }
+        // } else {
+        //     //disable
+        //     if (this.__resizeWithBrowserSize) {
+        //         this.__resizeWithBrowserSize = false;
+        //         window.removeEventListener('resize', this._resizeEvent);
+        //         window.removeEventListener('orientationchange', this._orientationChange);
+        //     }
+        // }
     },
 
     /**
@@ -304,29 +250,29 @@ var View = cc._Class.extend({
         var locFrameSize = this._frameSize;
         var w = __BrowserGetter.availWidth(cc.game.frame);
         var h = __BrowserGetter.availHeight(cc.game.frame);
-        var isLandscape = w >= h;
+        // var isLandscape = w >= h;
 
-        if (CC_EDITOR || !this._orientationChanging || !cc.sys.isMobile ||
-            (isLandscape && this._orientation & cc.macro.ORIENTATION_LANDSCAPE) || 
-            (!isLandscape && this._orientation & cc.macro.ORIENTATION_PORTRAIT)) {
+        // if (CC_EDITOR || !this._orientationChanging || !cc.sys.isMobile ||
+        //     (isLandscape && this._orientation & cc.macro.ORIENTATION_LANDSCAPE) || 
+        //     (!isLandscape && this._orientation & cc.macro.ORIENTATION_PORTRAIT)) {
             locFrameSize.width = w;
             locFrameSize.height = h;
-            cc.container.style['-webkit-transform'] = 'rotate(0deg)';
-            cc.container.style.transform = 'rotate(0deg)';
+            // cc.container.style['-webkit-transform'] = 'rotate(0deg)';
+            // cc.container.style.transform = 'rotate(0deg)';
             this._isRotated = false;
-        }
-        else {
-            locFrameSize.width = h;
-            locFrameSize.height = w;
-            cc.container.style['-webkit-transform'] = 'rotate(90deg)';
-            cc.container.style.transform = 'rotate(90deg)';
-            cc.container.style['-webkit-transform-origin'] = '0px 0px 0px';
-            cc.container.style.transformOrigin = '0px 0px 0px';
-            this._isRotated = true;
-        }
-        setTimeout(function () {
-            cc.view._orientationChanging = false;
-        }, 1000);
+        // }
+        // else {
+        //     locFrameSize.width = h;
+        //     locFrameSize.height = w;
+        //     cc.container.style['-webkit-transform'] = 'rotate(90deg)';
+        //     cc.container.style.transform = 'rotate(90deg)';
+        //     cc.container.style['-webkit-transform-origin'] = '0px 0px 0px';
+        //     cc.container.style.transformOrigin = '0px 0px 0px';
+        //     this._isRotated = true;
+        // }
+        // setTimeout(function () {
+        //     cc.view._orientationChanging = false;
+        // }, 1000);
     },
 
     // hack
@@ -337,47 +283,47 @@ var View = cc._Class.extend({
             this.setDesignResolutionSize(designWidth, designHeight, this._resolutionPolicy);
     },
 
-    _setViewportMeta: function (metas, overwrite) {
-        var vp = document.getElementById("cocosMetaElement");
-        if(vp && overwrite){
-            document.head.removeChild(vp);
-        }
+    // _setViewportMeta: function (metas, overwrite) {
+    //     var vp = document.getElementById("cocosMetaElement");
+    //     if(vp && overwrite){
+    //         document.head.removeChild(vp);
+    //     }
 
-        var elems = document.getElementsByName("viewport"),
-            currentVP = elems ? elems[0] : null,
-            content, key, pattern;
+    //     var elems = document.getElementsByName("viewport"),
+    //         currentVP = elems ? elems[0] : null,
+    //         content, key, pattern;
 
-        content = currentVP ? currentVP.content : "";
-        vp = vp || document.createElement("meta");
-        vp.id = "cocosMetaElement";
-        vp.name = "viewport";
-        vp.content = "";
+    //     content = currentVP ? currentVP.content : "";
+    //     vp = vp || document.createElement("meta");
+    //     vp.id = "cocosMetaElement";
+    //     vp.name = "viewport";
+    //     vp.content = "";
 
-        for (key in metas) {
-            if (content.indexOf(key) == -1) {
-                content += "," + key + "=" + metas[key];
-            }
-            else if (overwrite) {
-                pattern = new RegExp(key+"\s*=\s*[^,]+");
-                content.replace(pattern, key + "=" + metas[key]);
-            }
-        }
-        if(/^,/.test(content))
-            content = content.substr(1);
+    //     for (key in metas) {
+    //         if (content.indexOf(key) == -1) {
+    //             content += "," + key + "=" + metas[key];
+    //         }
+    //         else if (overwrite) {
+    //             pattern = new RegExp(key+"\s*=\s*[^,]+");
+    //             content.replace(pattern, key + "=" + metas[key]);
+    //         }
+    //     }
+    //     if(/^,/.test(content))
+    //         content = content.substr(1);
 
-        vp.content = content;
-        // For adopting certain android devices which don't support second viewport
-        if (currentVP)
-            currentVP.content = content;
+    //     vp.content = content;
+    //     // For adopting certain android devices which don't support second viewport
+    //     if (currentVP)
+    //         currentVP.content = content;
 
-        document.head.appendChild(vp);
-    },
+    //     document.head.appendChild(vp);
+    // },
 
     _adjustViewportMeta: function () {
-        if (this._isAdjustViewPort) {
-            this._setViewportMeta(__BrowserGetter.meta, false);
-            this._isAdjustViewPort = false;
-        }
+        // if (this._isAdjustViewPort) {
+        //     this._setViewportMeta(__BrowserGetter.meta, false);
+        //     this._isAdjustViewPort = false;
+        // }
     },
 
     // Other helper functions
@@ -434,37 +380,37 @@ var View = cc._Class.extend({
      * @param {Boolean} enabled - Enable or not anti-alias
      */
     enableAntiAlias: function (enabled) {
-        if (this._antiAliasEnabled === enabled) {
-            return;
-        }
-        this._antiAliasEnabled = enabled;
-        if(cc._renderType === cc.game.RENDER_TYPE_WEBGL) {
-            var map = cc.loader._items.map;
-            for (var key in map) {
-                var item = map[key];
-                var tex = item && item.content instanceof cc.Texture2D ? item.content : null;
-                if (tex) {
-                    if (enabled) {
-                        tex.setAntiAliasTexParameters();
-                    }
-                    else {
-                        tex.setAliasTexParameters();
-                    }
-                }
-            }
-        }
-        else if(cc._renderType === cc.game.RENDER_TYPE_CANVAS) {
-            var ctx = cc._canvas.getContext('2d');
-            ctx.imageSmoothingEnabled = enabled;
-            ctx.mozImageSmoothingEnabled = enabled;
-            // refresh canvas
-            var dirtyRegion = cc.rendererCanvas._dirtyRegion;
-            if (dirtyRegion) {
-                var oldRegion = new cc.Region();
-                oldRegion.setTo(0, 0, cc.visibleRect.width, cc.visibleRect.height);
-                dirtyRegion.addRegion(oldRegion);
-            }
-        }
+        // if (this._antiAliasEnabled === enabled) {
+        //     return;
+        // }
+        // this._antiAliasEnabled = enabled;
+        // if(cc._renderType === cc.game.RENDER_TYPE_WEBGL) {
+        //     var map = cc.loader._items.map;
+        //     for (var key in map) {
+        //         var item = map[key];
+        //         var tex = item && item.content instanceof cc.Texture2D ? item.content : null;
+        //         if (tex) {
+        //             if (enabled) {
+        //                 tex.setAntiAliasTexParameters();
+        //             }
+        //             else {
+        //                 tex.setAliasTexParameters();
+        //             }
+        //         }
+        //     }
+        // }
+        // else if(cc._renderType === cc.game.RENDER_TYPE_CANVAS) {
+        //     var ctx = cc._canvas.getContext('2d');
+        //     ctx.imageSmoothingEnabled = enabled;
+        //     ctx.mozImageSmoothingEnabled = enabled;
+        //     // refresh canvas
+        //     var dirtyRegion = cc.rendererCanvas._dirtyRegion;
+        //     if (dirtyRegion) {
+        //         var oldRegion = new cc.Region();
+        //         oldRegion.setTo(0, 0, cc.visibleRect.width, cc.visibleRect.height);
+        //         dirtyRegion.addRegion(oldRegion);
+        //     }
+        // }
     },
 
     /**
@@ -484,14 +430,14 @@ var View = cc._Class.extend({
      * @param {Boolean} enabled - Enable or disable auto full screen on mobile devices
      */
     enableAutoFullScreen: function(enabled) {
-        if (enabled && enabled !== this._autoFullScreen && cc.sys.isMobile && cc.game.frame === document.documentElement) {
-            // Automatically full screen when user touches on mobile version
-            this._autoFullScreen = true;
-            cc.screen.autoFullScreen(cc.game.frame);
-        }
-        else {
-            this._autoFullScreen = false;
-        }
+        // if (enabled && enabled !== this._autoFullScreen && cc.sys.isMobile && cc.game.frame === document.documentElement) {
+        //     // Automatically full screen when user touches on mobile version
+        //     this._autoFullScreen = true;
+        //     cc.screen.autoFullScreen(cc.game.frame);
+        // }
+        // else {
+        //     this._autoFullScreen = false;
+        // }
     },
 
     /**
@@ -597,13 +543,13 @@ var View = cc._Class.extend({
      * @param {Number} height
      */
     setFrameSize: function (width, height) {
-        this._frameSize.width = width;
-        this._frameSize.height = height;
-        cc.game.frame.style.width = width + "px";
-        cc.game.frame.style.height = height + "px";
-        //this.centerWindow();
-        this._resizeEvent();
-        cc.director.setProjection(cc.director.getProjection());
+        // this._frameSize.width = width;
+        // this._frameSize.height = height;
+        // cc.game.frame.style.width = width + "px";
+        // cc.game.frame.style.height = height + "px";
+        // //this.centerWindow();
+        // this._resizeEvent();
+        // cc.director.setProjection(cc.director.getProjection());
     },
 
     /**
@@ -747,8 +693,8 @@ var View = cc._Class.extend({
 
             vb.x = -vp.x / this._scaleX;
             vb.y = -vp.y / this._scaleY;
-            vb.width = cc.game.canvas.width / this._scaleX;
-            vb.height = cc.game.canvas.height / this._scaleY;
+            vb.width = this._frameSize.width / this._scaleX;
+            vb.height = this._frameSize.height / this._scaleY;
             cc._renderContext.setOffset && cc._renderContext.setOffset(vp.x, -vp.y);
         }
 
@@ -760,19 +706,10 @@ var View = cc._Class.extend({
         cc.winSize.width = director._winSizeInPoints.width;
         cc.winSize.height = director._winSizeInPoints.height;
 
-        if (cc._renderType === cc.game.RENDER_TYPE_WEBGL) {
-            // reset director's member variables to fit visible rect
-            director.setGLDefaultValues();
-        }
-        else if (cc._renderType === cc.game.RENDER_TYPE_CANVAS) {
-            cc.renderer._allNeedDraw = true;
-        }
+        cc.renderer._allNeedDraw = true;
 
         this._originalScaleX = this._scaleX;
         this._originalScaleY = this._scaleY;
-        // For editbox
-        if (cc.DOM)
-            cc.DOM._resetEGLViewDiv();
         cc.visibleRect && cc.visibleRect.init(this._visibleRect);
     },
 
@@ -803,12 +740,12 @@ var View = cc._Class.extend({
      */
     setRealPixelResolution: function (width, height, resolutionPolicy) {
         // Set viewport's width
-        this._setViewportMeta({"width": width}, true);
+        // this._setViewportMeta({"width": width}, true);
 
         // Set body width to the exact pixel resolution
-        document.body.style.width = width + "px";
-        document.body.style.left = "0px";
-        document.body.style.top = "0px";
+        // document.body.style.width = width + "px";
+        // document.body.style.left = "0px";
+        // document.body.style.top = "0px";
 
         // Reset the resolution size and policy
         this.setDesignResolutionSize(width, height, resolutionPolicy);
@@ -823,11 +760,11 @@ var View = cc._Class.extend({
      * @param {Number} h height
      */
     setViewPortInPoints: function (x, y, w, h) {
-        var locFrameZoomFactor = this._frameZoomFactor, locScaleX = this._scaleX, locScaleY = this._scaleY;
-        cc._renderContext.viewport((x * locScaleX * locFrameZoomFactor + this._viewPortRect.x * locFrameZoomFactor),
-            (y * locScaleY * locFrameZoomFactor + this._viewPortRect.y * locFrameZoomFactor),
-            (w * locScaleX * locFrameZoomFactor),
-            (h * locScaleY * locFrameZoomFactor));
+        // var locFrameZoomFactor = this._frameZoomFactor, locScaleX = this._scaleX, locScaleY = this._scaleY;
+        // cc._renderContext.viewport((x * locScaleX * locFrameZoomFactor + this._viewPortRect.x * locFrameZoomFactor),
+        //     (y * locScaleY * locFrameZoomFactor + this._viewPortRect.y * locFrameZoomFactor),
+        //     (w * locScaleX * locFrameZoomFactor),
+        //     (h * locScaleY * locFrameZoomFactor));
     },
 
     /**
@@ -839,15 +776,15 @@ var View = cc._Class.extend({
      * @param {Number} h
      */
     setScissorInPoints: function (x, y, w, h) {
-        var zoomFactor = this._frameZoomFactor, scaleX = this._scaleX, scaleY = this._scaleY;
-        _scissorRect.x = x;
-        _scissorRect.y = y;
-        _scissorRect.width = w;
-        _scissorRect.height = h;
-        cc._renderContext.scissor(x * scaleX * zoomFactor + this._viewPortRect.x * zoomFactor,
-                                  y * scaleY * zoomFactor + this._viewPortRect.y * zoomFactor,
-                                  w * scaleX * zoomFactor,
-                                  h * scaleY * zoomFactor);
+        // var zoomFactor = this._frameZoomFactor, scaleX = this._scaleX, scaleY = this._scaleY;
+        // _scissorRect.x = x;
+        // _scissorRect.y = y;
+        // _scissorRect.width = w;
+        // _scissorRect.height = h;
+        // cc._renderContext.scissor(x * scaleX * zoomFactor + this._viewPortRect.x * zoomFactor,
+        //                           y * scaleY * zoomFactor + this._viewPortRect.y * zoomFactor,
+        //                           w * scaleX * zoomFactor,
+        //                           h * scaleY * zoomFactor);
     },
 
     /**
@@ -856,7 +793,8 @@ var View = cc._Class.extend({
      * @return {Boolean}
      */
     isScissorEnabled: function () {
-        return cc._renderContext.isEnabled(gl.SCISSOR_TEST);
+        return false;
+        // return cc._renderContext.isEnabled(gl.SCISSOR_TEST);
     },
 
     /**
@@ -1013,37 +951,37 @@ cc.ContainerStrategy = cc._Class.extend(/** @lends cc.ContainerStrategy# */{
     },
 
     _setupContainer: function (view, w, h) {
-        var locCanvas = cc.game.canvas, locContainer = cc.game.container;
-        if (cc.sys.os === cc.sys.OS_ANDROID) {
-            document.body.style.width = (view._isRotated ? h : w) + 'px';
-            document.body.style.height = (view._isRotated ? w : h) + 'px';
-        }
+        // var locCanvas = cc.game.canvas, locContainer = cc.game.container;
+        // if (cc.sys.os === cc.sys.OS_ANDROID) {
+        //     document.body.style.width = (view._isRotated ? h : w) + 'px';
+        //     document.body.style.height = (view._isRotated ? w : h) + 'px';
+        // }
 
         // Setup style
-        locContainer.style.width = locCanvas.style.width = w + 'px';
-        locContainer.style.height = locCanvas.style.height = h + 'px';
+        // locContainer.style.width = locCanvas.style.width = w + 'px';
+        // locContainer.style.height = locCanvas.style.height = h + 'px';
         // Setup pixel ratio for retina display
-        var devicePixelRatio = view._devicePixelRatio = 1;
-        if (view.isRetinaEnabled())
-            devicePixelRatio = view._devicePixelRatio = Math.min(2, window.devicePixelRatio || 1);
+        // var devicePixelRatio = view._devicePixelRatio = 1;
+        // if (view.isRetinaEnabled())
+        //     devicePixelRatio = view._devicePixelRatio = Math.min(2, window.devicePixelRatio || 1);
         // Setup canvas
-        locCanvas.width = w * devicePixelRatio;
-        locCanvas.height = h * devicePixelRatio;
-        cc._renderContext.resetCache && cc._renderContext.resetCache();
+        // locCanvas.width = w * devicePixelRatio;
+        // locCanvas.height = h * devicePixelRatio;
+        // cc._renderContext.resetCache && cc._renderContext.resetCache();
     },
 
     _fixContainer: function () {
         // Add container to document body
-        document.body.insertBefore(cc.container, document.body.firstChild);
-        // Set body's width height to window's size, and forbid overflow, so that game will be centered
-        var bs = document.body.style;
-        bs.width = window.innerWidth + "px";
-        bs.height = window.innerHeight + "px";
-        bs.overflow = "hidden";
-        // Body size solution doesn't work on all mobile browser so this is the aleternative: fixed container
-        cc.container.style.position = "fixed";
-        // Reposition body
-        document.body.scrollTop = 0;
+        // document.body.insertBefore(cc.container, document.body.firstChild);
+        // // Set body's width height to window's size, and forbid overflow, so that game will be centered
+        // var bs = document.body.style;
+        // bs.width = window.innerWidth + "px";
+        // bs.height = window.innerHeight + "px";
+        // bs.overflow = "hidden";
+        // // Body size solution doesn't work on all mobile browser so this is the aleternative: fixed container
+        // cc.container.style.position = "fixed";
+        // // Reposition body
+        // document.body.scrollTop = 0;
     }
 });
 
@@ -1119,15 +1057,6 @@ cc.ContentStrategy = cc._Class.extend(/** @lends cc.ContentStrategy# */{
      */
     var EqualToFrame = cc.ContainerStrategy.extend({
         apply: function (view) {
-            var frameH = view._frameSize.height, containerStyle = cc.container.style;
-            this._setupContainer(view, view._frameSize.width, view._frameSize.height);
-            // Setup container's margin and padding
-            if (view._isRotated) {
-                containerStyle.marginLeft = frameH + 'px';
-            }
-            else {
-                containerStyle.margin = '0px';
-            }
         }
     });
 
@@ -1137,93 +1066,18 @@ cc.ContentStrategy = cc._Class.extend(/** @lends cc.ContentStrategy# */{
      */
     var ProportionalToFrame = cc.ContainerStrategy.extend({
         apply: function (view, designedResolution) {
-            var frameW = view._frameSize.width, frameH = view._frameSize.height, containerStyle = cc.container.style,
-                designW = designedResolution.width, designH = designedResolution.height,
-                scaleX = frameW / designW, scaleY = frameH / designH,
-                containerW, containerH;
-
-            scaleX < scaleY ? (containerW = frameW, containerH = designH * scaleX) : (containerW = designW * scaleY, containerH = frameH);
-
-            // Adjust container size with integer value
-            var offx = Math.round((frameW - containerW) / 2);
-            var offy = Math.round((frameH - containerH) / 2);
-            containerW = frameW - 2 * offx;
-            containerH = frameH - 2 * offy;
-
-            this._setupContainer(view, containerW, containerH);
-            if (!CC_EDITOR) {
-                // Setup container's margin and padding
-                if (view._isRotated) {
-                    containerStyle.marginLeft = frameH + 'px';
-                }
-                else {
-                    containerStyle.margin = '0px';
-                }
-                containerStyle.paddingLeft = offx + "px";
-                containerStyle.paddingRight = offx + "px";
-                containerStyle.paddingTop = offy + "px";
-                containerStyle.paddingBottom = offy + "px";
-            }
         }
     });
 
-    /**
-     * @class EqualToWindow
-     * @extends EqualToFrame
-     */
-    var EqualToWindow = EqualToFrame.extend({
-        preApply: function (view) {
-            this._super(view);
-            cc.game.frame = document.documentElement;
-        },
-
-        apply: function (view) {
-            this._super(view);
-            this._fixContainer();
-        }
-    });
-
-    /**
-     * @class ProportionalToWindow
-     * @extends ProportionalToFrame
-     */
-    var ProportionalToWindow = ProportionalToFrame.extend({
-        preApply: function (view) {
-            this._super(view);
-            cc.game.frame = document.documentElement;
-        },
-
-        apply: function (view, designedResolution) {
-            this._super(view, designedResolution);
-            this._fixContainer();
-        }
-    });
-
-    /**
-     * @class OriginalContainer
-     * @extends ContainerStrategy
-     */
-    var OriginalContainer = cc.ContainerStrategy.extend({
-        apply: function (view) {
-            this._setupContainer(view, cc.game.canvas.width, cc.game.canvas.height);
-        }
-    });
-
-// #NOT STABLE on Android# Alias: Strategy that makes the container's size equals to the window's size
-//    cc.ContainerStrategy.EQUAL_TO_WINDOW = new EqualToWindow();
-// #NOT STABLE on Android# Alias: Strategy that scale proportionally the container's size to window's size
-//    cc.ContainerStrategy.PROPORTION_TO_WINDOW = new ProportionalToWindow();
 // Alias: Strategy that makes the container's size equals to the frame's size
     cc.ContainerStrategy.EQUAL_TO_FRAME = new EqualToFrame();
 // Alias: Strategy that scale proportionally the container's size to frame's size
     cc.ContainerStrategy.PROPORTION_TO_FRAME = new ProportionalToFrame();
-// Alias: Strategy that keeps the original container's size
-    cc.ContainerStrategy.ORIGINAL_CONTAINER = new OriginalContainer();
 
 // Content scale strategys
     var ExactFit = cc.ContentStrategy.extend({
         apply: function (view, designedResolution) {
-            var containerW = cc.game.canvas.width, containerH = cc.game.canvas.height,
+            var containerW = view._frameSize.width, containerH = view._frameSize.height,
                 scaleX = containerW / designedResolution.width, scaleY = containerH / designedResolution.height;
 
             return this._buildResult(containerW, containerH, containerW, containerH, scaleX, scaleY);
@@ -1232,7 +1086,7 @@ cc.ContentStrategy = cc._Class.extend(/** @lends cc.ContentStrategy# */{
 
     var ShowAll = cc.ContentStrategy.extend({
         apply: function (view, designedResolution) {
-            var containerW = cc.game.canvas.width, containerH = cc.game.canvas.height,
+            var containerW = view._frameSize.width, containerH = view._frameSize.height,
                 designW = designedResolution.width, designH = designedResolution.height,
                 scaleX = containerW / designW, scaleY = containerH / designH, scale = 0,
                 contentW, contentH;
@@ -1246,7 +1100,7 @@ cc.ContentStrategy = cc._Class.extend(/** @lends cc.ContentStrategy# */{
 
     var NoBorder = cc.ContentStrategy.extend({
         apply: function (view, designedResolution) {
-            var containerW = cc.game.canvas.width, containerH = cc.game.canvas.height,
+            var containerW = view._frameSize.width, containerH = view._frameSize.height,
                 designW = designedResolution.width, designH = designedResolution.height,
                 scaleX = containerW / designW, scaleY = containerH / designH, scale,
                 contentW, contentH;
@@ -1260,7 +1114,7 @@ cc.ContentStrategy = cc._Class.extend(/** @lends cc.ContentStrategy# */{
 
     var FixedHeight = cc.ContentStrategy.extend({
         apply: function (view, designedResolution) {
-            var containerW = cc.game.canvas.width, containerH = cc.game.canvas.height,
+            var containerW = view._frameSize.width, containerH = view._frameSize.height,
                 designH = designedResolution.height, scale = containerH / designH,
                 contentW = containerW, contentH = containerH;
 
@@ -1274,7 +1128,7 @@ cc.ContentStrategy = cc._Class.extend(/** @lends cc.ContentStrategy# */{
 
     var FixedWidth = cc.ContentStrategy.extend({
         apply: function (view, designedResolution) {
-            var containerW = cc.game.canvas.width, containerH = cc.game.canvas.height,
+            var containerW = view._frameSize.width, containerH = view._frameSize.height,
                 designW = designedResolution.width, scale = containerW / designW,
                 contentW = containerW, contentH = containerH;
 

@@ -45,9 +45,7 @@ cc.rendererCanvas = {
     //max dirty Region count, default is 10
     _dirtyRegionCountThreshold: 10,
     init: function() {
-        if(cc.sys.browserType === cc.sys.BROWSER_TYPE_IE || cc.sys.browserType === cc.sys.BROWSER_TYPE_UC) {
-            this.enableDirtyRegion(false);
-        }
+        this.enableDirtyRegion(false);
     },
 
     getRenderCmd: function (renderableObject) {
@@ -148,13 +146,13 @@ cc.rendererCanvas = {
      */
     rendering: function (ctxWrapper) {
         var dirtyRegion = this._dirtyRegion = this._dirtyRegion || new cc.DirtyRegion();
-        var viewport = cc._canvas;
+        var viewport = cc.view._frameSize;
         var wrapper = ctxWrapper || cc._renderContext;
         var ctx = wrapper.getContext();
 
         var scaleX = cc.view.getScaleX(),
             scaleY = cc.view.getScaleY();
-        wrapper.setViewScale(scaleX,scaleY);
+        wrapper.setViewScale(scaleX, scaleY);
         wrapper.computeRealOffsetY();
         var dirtyList = this._dirtyRegion.getDirtyRegions();
         var locCmds = this._renderCmds, i, len;
@@ -167,7 +165,8 @@ cc.rendererCanvas = {
             this._beginDrawDirtyRegion(wrapper);
         }
 
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        // ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearActions();
         ctx.clearRect(0, 0, viewport.width, viewport.height);
         if (this._clearColor.r !== 0 ||
             this._clearColor.g !== 0 ||
@@ -204,60 +203,13 @@ cc.rendererCanvas = {
             this._endDrawDirtyRegion(ctx);
         }
 
+        wx.drawCanvas({
+            canvasId: cc.game.config.id,
+            actions: ctx.getActions()
+        });
+
         dirtyRegion.clear();
         this._allNeedDraw = false;
-    },
-
-    /**
-     * drawing all renderer command to cache canvas' context
-     * @param {cc.CanvasContextWrapper} ctx
-     * @param {Number} [instanceID]
-     * @param {Number} [scaleX]
-     * @param {Number} [scaleY]
-     */
-    _renderingToCacheCanvas: function (ctx, instanceID, scaleX, scaleY) {
-        if (!ctx)
-            cc.log("The context of RenderTexture is invalid.");
-        scaleX = scaleX === undefined ? 1 : scaleX;
-        scaleY = scaleY === undefined ? 1 : scaleY;
-        instanceID = instanceID || this._currentID;
-        var locCmds = this._cacheToCanvasCmds[instanceID], i, len;
-        ctx.computeRealOffsetY();
-        for (i = 0, len = locCmds.length; i < len; i++) {
-            locCmds[i].rendering(ctx, scaleX, scaleY);
-        }
-        this._removeCache(instanceID);
-
-        var locIDs = this._cacheInstanceIds;
-        if (locIDs.length === 0)
-            this._isCacheToCanvasOn = false;
-        else
-            this._currentID = locIDs[locIDs.length - 1];
-    },
-
-    _turnToCacheMode: function (renderTextureID) {
-        this._isCacheToCanvasOn = true;
-        renderTextureID = renderTextureID || 0;
-        this._cacheToCanvasCmds[renderTextureID] = [];
-        if(this._cacheInstanceIds.indexOf(renderTextureID) === -1)
-            this._cacheInstanceIds.push(renderTextureID);
-        this._currentID = renderTextureID;
-    },
-
-    _turnToNormalMode: function () {
-        this._isCacheToCanvasOn = false;
-    },
-
-    _removeCache: function (instanceID) {
-        instanceID = instanceID || this._currentID;
-        var cmds = this._cacheToCanvasCmds[instanceID];
-        if (cmds) {
-            cmds.length = 0;
-            delete this._cacheToCanvasCmds[instanceID];
-        }
-
-        var locIDs = this._cacheInstanceIds;
-        cc.js.array.remove(locIDs, instanceID);
     },
 
     resetFlag: function () {
@@ -319,15 +271,15 @@ cc.rendererCanvas = {
         this._context = context;
 
         this._saveCount = 0;
-        this._currentAlpha = context.globalAlpha;
-        this._currentCompositeOperation = context.globalCompositeOperation;
+        // this._currentAlpha = context.globalAlpha;
+        // this._currentCompositeOperation = context.globalCompositeOperation;
         this._currentFillStyle = context.fillStyle;
         this._currentStrokeStyle = context.strokeStyle;
 
         this._offsetX = 0;
         this._offsetY = 0;
         this._realOffsetY = this.height;
-        this._armatureMode = 0;
+        // this._armatureMode = 0;
     };
 
     var proto = cc.CanvasContextWrapper.prototype;
@@ -335,21 +287,21 @@ cc.rendererCanvas = {
     proto.resetCache = function(){
         var context = this._context;
         //call it after resize cc._canvas, because context will reset.
-        this._currentAlpha = context.globalAlpha;
-        this._currentCompositeOperation = context.globalCompositeOperation;
+        // this._currentAlpha = context.globalAlpha;
+        // this._currentCompositeOperation = context.globalCompositeOperation;
         this._currentFillStyle = context.fillStyle;
         this._currentStrokeStyle = context.strokeStyle;
-        this._realOffsetY = this._context.canvas.height + this._offsetY;
+        this._realOffsetY = cc.sys.windowPixelResolution.height + this._offsetY;
     };
 
     proto.setOffset = function(x, y){
         this._offsetX = x;
         this._offsetY = y;
-        this._realOffsetY = this._context.canvas.height + this._offsetY;
+        this._realOffsetY = cc.sys.windowPixelResolution.height + this._offsetY;
     };
 
     proto.computeRealOffsetY = function(){
-        this._realOffsetY = this._context.canvas.height + this._offsetY;
+        this._realOffsetY = cc.sys.windowPixelResolution.height + this._offsetY;
     };
 
     proto.setViewScale = function(scaleX, scaleY){
@@ -360,16 +312,6 @@ cc.rendererCanvas = {
 
     proto.getContext = function(){
         return this._context;
-    };
-
-    proto.save = function () {
-        this._context.save();
-        this._saveCount++;
-    };
-
-    proto.restore = function () {
-        this._context.restore();
-        this._saveCount--;
     };
 
     proto.setGlobalAlpha = function (alpha) {
@@ -384,14 +326,14 @@ cc.rendererCanvas = {
     };
 
     proto.setCompositeOperation = function(compositionOperation){
-        if (this._saveCount > 0) {
-            this._context.globalCompositeOperation = compositionOperation;
-        } else {
-            if (this._currentCompositeOperation !== compositionOperation) {
-                this._currentCompositeOperation = compositionOperation;
-                this._context.globalCompositeOperation = compositionOperation;
-            }
-        }
+        // if (this._saveCount > 0) {
+        //     this._context.globalCompositeOperation = compositionOperation;
+        // } else {
+        //     if (this._currentCompositeOperation !== compositionOperation) {
+        //         this._currentCompositeOperation = compositionOperation;
+        //         this._context.globalCompositeOperation = compositionOperation;
+        //     }
+        // }
     };
 
     proto.setFillStyle = function(fillStyle){
@@ -410,25 +352,7 @@ cc.rendererCanvas = {
     };
 
     proto.setTransform = function(t, scaleX, scaleY){
-        if (this._armatureMode > 0) {
-            //ugly for armature
-            this.restore();
-            this.save();
-            this._context.transform(t.a, -t.b, -t.c, t.d, t.tx * scaleX, -(t.ty * scaleY));
-        } else {
-            this._context.setTransform(t.a * scaleX, -t.b * scaleY, -t.c * scaleX, t.d * scaleY, this._offsetX + t.tx * scaleX, this._realOffsetY - (t.ty * scaleY));
-        }
-    };
-
-    proto._switchToArmatureMode = function(enable, t, scaleX, scaleY){
-        if(enable){
-            this._armatureMode++;
-            this._context.setTransform(t.a, t.c, t.b, t.d, this._offsetX + t.tx * scaleX, this._realOffsetY - (t.ty * scaleY));
-            this.save();
-        }else{
-            this._armatureMode--;
-            this.restore();
-        }
+        this._context.setTransform(t.a * scaleX, -t.b * scaleY, -t.c * scaleX, t.d * scaleY, this._offsetX + t.tx * scaleX, this._realOffsetY - (t.ty * scaleY));
     };
 })();
 

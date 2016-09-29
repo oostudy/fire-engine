@@ -24,8 +24,5 @@
  ****************************************************************************/
  
 require('./CCPath');
-if (!CC_EDITOR && !CC_JSB) {
-    require('./CCProfiler');
-}
 require('./find');
 require('./mutable-forward-iterator');

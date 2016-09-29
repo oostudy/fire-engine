@@ -291,6 +291,12 @@ sys.MOBILE_BROWSER = 100;
  * @default 101
  */
 sys.DESKTOP_BROWSER = 101;
+/**
+ * @property {Number} WEAPP
+ * @readOnly
+ * @default 102
+ */
+sys.WEAPP = 102;
 
 /**
  * Indicates whether executes in editor's window process (Electron's renderer context)
@@ -306,6 +312,13 @@ sys.EDITOR_PAGE = 102;
  * @default 103
  */
 sys.EDITOR_CORE = 103;
+/**
+ * BROWSER_TYPE_WEAPP
+ * @property {String} BROWSER_TYPE_WEAPP
+ * @readOnly
+ * @default "weapp"
+ */
+sys.BROWSER_TYPE_WEAPP = "weapp";
 /**
  * BROWSER_TYPE_WECHAT
  * @property {String} BROWSER_TYPE_WECHAT
@@ -459,7 +472,40 @@ sys.isNative = false;
  */
 sys.isBrowser = typeof window === 'object' && typeof document === 'object';
 
-if (CC_EDITOR && Editor.isMainProcess) {
+if (wx) {
+    sys.isMobile = true;
+    sys.platform = sys.WEAPP;
+    sys.language = sys.LANGUAGE_CHINESE;
+
+    sys.os = sys.OS_UNKNOWN;
+    sys.osVersion = '0';
+    sys.osMainVersion = 0;
+    sys.isBrowser = true;
+    sys.browserVersion = '';
+    sys.browserType = sys.BROWSER_TYPE_WEAPP;
+
+    sys.windowPixelResolution = {
+        width: 0,
+        height: 0
+    };
+
+    wx.getSystemInfo({
+        complete: function(res) {
+            sys.windowPixelResolution.width = res.windowWidth;
+            sys.windowPixelResolution.height = res.windowHeight;
+            sys.language = res.language;
+            sys.browserVersion = res.version;
+            sys.devicePixelRatio = res.pixelRatio;
+        }
+    });
+
+    sys.capabilities = {
+        canvas: true,
+        opengl: false
+    };
+    sys.__audioSupport = {};
+}
+else if (CC_EDITOR && Editor.isMainProcess) {
     sys.isMobile = false;
     sys.platform = sys.EDITOR_CORE;
     sys.language = sys.LANGUAGE_UNKNOWN;

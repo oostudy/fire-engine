@@ -480,28 +480,28 @@ function _checkCtor (ctor, className) {
 
 function normalizeClassName (className) {
     if (CC_DEV) {
-        var DefaultName = 'CCClass';
-        if (className) {
-            className = className.replace(/\./g, '_');
-            className = className.split('').filter(function (x) { return /^[a-zA-Z0-9_$]/.test(x); }).join('');
-            if (/^[0-9]/.test(className[0])) {
-                className = '_' + className;
-            }
-            try {
-                // validate name
-                eval('function ' + className + '(){}');
-            }
-            catch (e) {
-                className = 'FireClass_' + className;
-                try {
-                    eval('function ' + className + '(){}');
-                }
-                catch (e) {
-                    return DefaultName;
-                }
-            }
-            return className;
-        }
+        // var DefaultName = 'CCClass';
+        // if (className) {
+        //     className = className.replace(/\./g, '_');
+        //     className = className.split('').filter(function (x) { return /^[a-zA-Z0-9_$]/.test(x); }).join('');
+        //     if (/^[0-9]/.test(className[0])) {
+        //         className = '_' + className;
+        //     }
+        //     try {
+        //         // validate name
+        //         eval('function ' + className + '(){}');
+        //     }
+        //     catch (e) {
+        //         className = 'FireClass_' + className;
+        //         try {
+        //             eval('function ' + className + '(){}');
+        //         }
+        //         catch (e) {
+        //             return DefaultName;
+        //         }
+        //     }
+        //     return className;
+        // }
         return DefaultName;
     }
 }
@@ -556,45 +556,14 @@ function _createCtor (ctor, baseClass, mixins, className, options) {
     }
 
     // create class constructor
-    var body;
-    if (CC_DEV) {
-        body = '(function ' + normalizeClassName(className) + '(){\n';
-    }
-    else {
-        body = '(function(){\n';
-    }
-    if (superCallBounded) {
-        body += 'this._super=null;\n';
-    }
-    body += 'instantiateProps(this,fireClass);\n';
-
-    // call user constructors
-    if (ctors.length > 0) {
-        body += 'var cs=fireClass.__ctors__;\n';
-
-        if (useTryCatch) {
-            body += 'try{\n';
-        }
-
-        if (ctors.length <= 5) {
-            for (var i = 0; i < ctors.length; i++) {
-                body += '(cs[' + i + ']).apply(this,arguments);\n';
-            }
-        }
-        else {
-            body += 'for(var i=0,l=cs.length;i<l;++i){\n';
-            body += '(cs[i]).apply(this,arguments);\n}\n';
-        }
-
-        if (useTryCatch) {
-            body += '}catch(e){\ncc._throw(e);\n}\n';
+    var fireClass = function () {
+        this._super = null;
+        instantiateProps(this, fireClass);
+        var cs = fireClass.__ctors__;
+        for (var i = 0, l = cs.length; i < l; ++i) {
+            cs[i].apply(this, arguments);
         }
     }
-    body += '})';
-
-    // jshint evil: true
-    var fireClass = eval(body);
-    // jshint evil: false
 
     Object.defineProperty(fireClass, '__ctors__', {
         value: ctors.length > 0 ? ctors : null,

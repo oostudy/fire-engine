@@ -40,43 +40,10 @@ else {
 }
 
 function downloadScript (item, callback, isAsync) {
-    var url = item.url,
-        d = document, 
-        s = document.createElement('script');
-    s.async = isAsync;
-    s.src = urlAppendTimestamp(url);
-    function loadHandler () {
-        s.parentNode.removeChild(s);
-        s.removeEventListener('load', loadHandler, false);
-        s.removeEventListener('error', errorHandler, false);
-        callback(null, url);
-    }
-    function errorHandler() {
-        s.parentNode.removeChild(s);
-        s.removeEventListener('load', loadHandler, false);
-        s.removeEventListener('error', errorHandler, false);
-        callback(new Error('Load ' + url + ' failed!'), url);
-    }
-    s.addEventListener('load', loadHandler, false);
-    s.addEventListener('error', errorHandler, false);
-    d.body.appendChild(s);
-}
-
-function downloadTextSync (item) {
     var url = item.url;
-    var xhr = Pipeline.getXMLHttpRequest();
-    xhr.open('GET', url, false);
-    if (/msie/i.test(window.navigator.userAgent) && !/opera/i.test(window.navigator.userAgent)) {
-        // IE-specific logic here
-        xhr.setRequestHeader('Accept-Charset', 'utf-8');
-    } else {
-        if (xhr.overrideMimeType) xhr.overrideMimeType('text\/plain; charset=utf-8');
-    }
-    xhr.send(null);
-    if (xhr.readyState !== 4 || !(xhr.status === 200 || xhr.status === 0)) {
-        return null;
-    }
-    return xhr.responseText;
+    
+    require(url);
+    callback(null, url);
 }
 
 function downloadImage (item, callback, isCrossOrigin) {
@@ -86,9 +53,6 @@ function downloadImage (item, callback, isCrossOrigin) {
 
     var url = urlAppendTimestamp(item.url);
     var img = new Image();
-    if (isCrossOrigin && window.location.origin !== 'file://') {
-        img.crossOrigin = 'anonymous';
-    }
 
     if (img.complete && img.naturalWidth > 0) {
         callback(null, img);
@@ -120,50 +84,6 @@ function downloadImage (item, callback, isCrossOrigin) {
     img.src = url;
 }
 
-var FONT_TYPE = {
-    '.eot' : 'embedded-opentype',
-    '.ttf' : 'truetype',
-    '.ttc' : 'truetype',
-    '.woff' : 'woff',
-    '.svg' : 'svg'
-};
-function _loadFont (name, srcs, type){
-    var doc = document, 
-        path = cc.path, 
-        fontStyle = document.createElement('style');
-    fontStyle.type = 'text/css';
-    doc.body.appendChild(fontStyle);
-
-    var fontStr = '';
-    if (isNaN(name - 0)) {
-        fontStr += '@font-face { font-family:' + name + '; src:';
-    }
-    else {
-        fontStr += '@font-face { font-family:\'' + name + '\'; src:';
-    }
-    if (srcs instanceof Array) {
-        for (var i = 0, li = srcs.length; i < li; i++) {
-            var src = srcs[i];
-            type = path.extname(src).toLowerCase();
-            fontStr += 'url(\'' + srcs[i] + '\') format(\'' + FONT_TYPE[type] + '\')';
-            fontStr += (i === li - 1) ? ';' : ',';
-        }
-    } else {
-        type = type.toLowerCase();
-        fontStr += 'url(\'' + srcs + '\') format(\'' + FONT_TYPE[type] + '\');';
-    }
-    fontStyle.textContent += fontStr + '}';
-
-    //<div style="font-family: PressStart;">.</div>
-    var preloadDiv = document.createElement('div');
-    var _divStyle =  preloadDiv.style;
-    _divStyle.fontFamily = name;
-    preloadDiv.innerHTML = '.';
-    _divStyle.position = 'absolute';
-    _divStyle.left = '-100px';
-    _divStyle.top = '-100px';
-    doc.body.appendChild(preloadDiv);
-}
 function downloadFont (item, callback) {
     var url = item.url,
         type = item.type, 
@@ -173,21 +93,11 @@ function downloadFont (item, callback) {
         if (srcs.indexOf(url) === -1) {
             srcs.push(url);
         }
-        _loadFont(name, srcs);
     } else {
         type = cc.path.extname(url);
         name = cc.path.basename(url, type);
-        _loadFont(name, url, type);
     }
-    if (document.fonts) {
-        document.fonts.load('1em ' + name).then(function () {
-            callback(null, null);
-        }, function(err){
-            callback(err);
-        });
-    } else {
-        callback(null, null);
-    }
+    callback(null, null);
 }
 
 function downloadUuid (item, callback) {

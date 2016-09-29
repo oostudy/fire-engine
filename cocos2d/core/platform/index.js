@@ -39,6 +39,5 @@ if (CC_JSB || cc.sys.isBrowser) {
 }
 
 if (!CC_JSB && !(CC_EDITOR && Editor.isMainProcess)) {
-    require('./miniFramework');
     require('./CCVisibleRect');
 }

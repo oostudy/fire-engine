@@ -151,17 +151,9 @@ cc.BlendFunc._additive = function(){
 
 cc.BlendFunc.BlendFactor = BlendFactor;
 
-/** @expose */
-cc.BlendFunc.DISABLE;
 cc.js.get(cc.BlendFunc, "DISABLE", cc.BlendFunc._disable);
-/** @expose */
-cc.BlendFunc.ALPHA_PREMULTIPLIED;
 cc.js.get(cc.BlendFunc, "ALPHA_PREMULTIPLIED", cc.BlendFunc._alphaPremultiplied);
-/** @expose */
-cc.BlendFunc.ALPHA_NON_PREMULTIPLIED;
 cc.js.get(cc.BlendFunc, "ALPHA_NON_PREMULTIPLIED", cc.BlendFunc._alphaNonPremultiplied);
-/** @expose */
-cc.BlendFunc.ADDITIVE;
 cc.js.get(cc.BlendFunc, "ADDITIVE", cc.BlendFunc._additive);
 
 /**

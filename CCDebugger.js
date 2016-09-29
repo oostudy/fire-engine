@@ -267,49 +267,6 @@ if (CC_DEV) {
     };
 }
 
-//+++++++++++++++++++++++++something about log start++++++++++++++++++++++++++++
-cc._logToWebPage = function (msg) {
-    if (!cc._canvas)
-        return;
-
-    var logList = cc._logList;
-    var doc = document;
-    if (!logList) {
-        var logDiv = doc.createElement("Div");
-        var logDivStyle = logDiv.style;
-
-        logDiv.setAttribute("id", "logInfoDiv");
-        cc._canvas.parentNode.appendChild(logDiv);
-        logDiv.setAttribute("width", "200");
-        logDiv.setAttribute("height", cc._canvas.height);
-        logDivStyle.zIndex = "99999";
-        logDivStyle.position = "absolute";
-        logDivStyle.top = "0";
-        logDivStyle.left = "0";
-
-        logList = cc._logList = doc.createElement("textarea");
-        var logListStyle = logList.style;
-
-        logList.setAttribute("rows", "20");
-        logList.setAttribute("cols", "30");
-        logList.setAttribute("disabled", true);
-        logDiv.appendChild(logList);
-        logListStyle.backgroundColor = "transparent";
-        logListStyle.borderBottom = "1px solid #cccccc";
-        logListStyle.borderRightWidth = "0px";
-        logListStyle.borderLeftWidth = "0px";
-        logListStyle.borderTopWidth = "0px";
-        logListStyle.borderTopStyle = "none";
-        logListStyle.borderRightStyle = "none";
-        logListStyle.borderLeftStyle = "none";
-        logListStyle.padding = "0px";
-        logListStyle.margin = 0;
-
-    }
-    logList.value = logList.value + msg + "\r\n";
-    logList.scrollTop = logList.scrollHeight;
-};
-
 //to make sure the cc.log, cc.warn, cc.error and cc.assert would not throw error before init by debugger mode.
 function _formatString (arg) {
     if (typeof arg === 'object') {
@@ -389,12 +346,6 @@ cc.DebugMode = Enum({
 });
 
 /**
- * @module cc
- */
-
-var jsbLog = cc.log || console.log;
-
-/**
  * !#en Init Debug setting.
  * !#zh 设置调试模式。
  * @method _initDebugSetting
@@ -408,32 +359,7 @@ cc._initDebugSetting = function (mode) {
         return;
 
     var locLog;
-    if (!CC_JSB && mode > cc.DebugMode.ERROR) {
-        //log to web page
-        locLog = cc._logToWebPage.bind(cc);
-        cc.error = function(){
-            locLog("ERROR :  " + cc.js.formatStr.apply(cc, arguments));
-        };
-        cc.assert = function(cond, msg) {
-            'use strict';
-            if (!cond && msg) {
-                for (var i = 2; i < arguments.length; i++)
-                    msg = msg.replace(/(%s)|(%d)/, _formatString(arguments[i]));
-                locLog("Assert: " + msg);
-            }
-        };
-        if(mode !== cc.DebugMode.ERROR_FOR_WEB_PAGE){
-            cc.warn = function(){
-                locLog("WARN :  " + cc.js.formatStr.apply(cc, arguments));
-            };
-        }
-        if(mode === cc.DebugMode.INFO_FOR_WEB_PAGE){
-            cc.log = cc.info = function(){
-                locLog(cc.js.formatStr.apply(cc, arguments));
-            };
-        }
-    }
-    else if(console && console.log.apply){//console is null when user doesn't open dev tool on IE9
+    if(console && console.log.apply){//console is null when user doesn't open dev tool on IE9
         //log to console
 
         // For JSB

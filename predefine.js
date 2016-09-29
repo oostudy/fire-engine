@@ -57,8 +57,8 @@ require('./polyfill/math');
 require('./cocos2d/core/platform/js');
 require('./cocos2d/core/value-types');
 require('./cocos2d/core/utils');
-require('./cocos2d/core/platform/CCInputManager');
-require('./cocos2d/core/platform/CCInputExtension');
+// require('./cocos2d/core/platform/CCInputManager');
+// require('./cocos2d/core/platform/CCInputExtension');
 require('./cocos2d/core/event');
 require('./cocos2d/core/platform/CCSys');
 require('./cocos2d/core/platform/CCMacro');
@@ -68,19 +68,13 @@ require('./cocos2d/core/textures');
 if (!CC_JSB) {
     require('./cocos2d/kazmath');
     require('./cocos2d/core/CCDirector');
-    require('./cocos2d/core/CCDirectorWebGL');
     require('./cocos2d/core/CCDirectorCanvas');
 
     if (!(CC_EDITOR && Editor.isMainProcess)) {
-        require('./cocos2d/core/platform/CCSAXParser');
         require('./cocos2d/core/platform/CCView');
-        require('./cocos2d/core/platform/CCScreen');
         require('./cocos2d/core/CCActionManager');
         require('./cocos2d/core/CCScheduler');
-        require('./cocos2d/core/event-manager');
         require('./cocos2d/core/renderer');
-        require('./cocos2d/shaders');
-        require('./cocos2d/compression');
 
         require('./CCBoot.js');
         require('./cocos2d/core/CCGame');

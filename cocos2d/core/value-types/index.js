@@ -32,4 +32,3 @@ require('./CCRect');
 require('./CCColor');
 require('./CCTypes');
 require('./CCAffineTransform');
-require('./CCTypesWebGL');

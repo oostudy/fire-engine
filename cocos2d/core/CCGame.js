@@ -323,7 +323,7 @@ var game = {
             config = self.config,
             CONFIG_KEY = self.CONFIG_KEY;
 
-        this._loadConfig();
+        this._initConfig(config);
 
         // Already prepared
         if (this._prepared) {
@@ -368,10 +368,6 @@ var game = {
              * @type Size
              */
             cc.winSize = cc.director.getWinSize();
-
-            if (!CC_EDITOR) {
-                this._initEvents();
-            }
 
             this._setAnimFrame();
             this._runMainLoop();
@@ -500,39 +496,39 @@ var game = {
         this._lastTime = new Date();
         this._frameTime = 1000 / game.config[game.CONFIG_KEY.frameRate];
         if((cc.sys.os === cc.sys.OS_IOS && cc.sys.browserType === cc.sys.BROWSER_TYPE_WECHAT) || game.config[game.CONFIG_KEY.frameRate] !== 60) {
-            window.requestAnimFrame = this._stTime;
-            window.cancelAnimationFrame = this._ctTime;
+            requestAnimFrame = this._stTime;
+            cancelAnimationFrame = this._ctTime;
         }
         else {
-            window.requestAnimFrame = window.requestAnimationFrame ||
-            window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame ||
-            window.oRequestAnimationFrame ||
-            window.msRequestAnimationFrame ||
+            requestAnimFrame = requestAnimationFrame ||
+            webkitRequestAnimationFrame ||
+            mozRequestAnimationFrame ||
+            oRequestAnimationFrame ||
+            msRequestAnimationFrame ||
             this._stTime;
-            window.cancelAnimationFrame = window.cancelAnimationFrame ||
-            window.cancelRequestAnimationFrame ||
-            window.msCancelRequestAnimationFrame ||
-            window.mozCancelRequestAnimationFrame ||
-            window.oCancelRequestAnimationFrame ||
-            window.webkitCancelRequestAnimationFrame ||
-            window.msCancelAnimationFrame ||
-            window.mozCancelAnimationFrame ||
-            window.webkitCancelAnimationFrame ||
-            window.oCancelAnimationFrame ||
+            cancelAnimationFrame = cancelAnimationFrame ||
+            cancelRequestAnimationFrame ||
+            msCancelRequestAnimationFrame ||
+            mozCancelRequestAnimationFrame ||
+            oCancelRequestAnimationFrame ||
+            webkitCancelRequestAnimationFrame ||
+            msCancelAnimationFrame ||
+            mozCancelAnimationFrame ||
+            webkitCancelAnimationFrame ||
+            oCancelAnimationFrame ||
             this._ctTime;
         }
     },
     _stTime: function(callback){
         var currTime = new Date().getTime();
         var timeToCall = Math.max(0, game._frameTime - (currTime - game._lastTime));
-        var id = window.setTimeout(function() { callback(); },
+        var id = setTimeout(function() { callback(); },
             timeToCall);
         game._lastTime = currTime + timeToCall;
         return id;
     },
     _ctTime: function(id){
-        window.clearTimeout(id);
+        clearTimeout(id);
     },
     //Run game.
     _runMainLoop: function () {
@@ -545,59 +541,16 @@ var game = {
             if (!self._paused) {
                 director.mainLoop();
                 if(self._intervalId)
-                    window.cancelAnimationFrame(self._intervalId);
-                self._intervalId = window.requestAnimFrame(callback);
+                    cancelAnimationFrame(self._intervalId);
+                self._intervalId = requestAnimFrame(callback);
             }
         };
 
-        window.requestAnimFrame(callback);
+        requestAnimFrame(callback);
         self._paused = false;
     },
 
 //  @Game loading section
-    _loadConfig: function () {
-        // Load config
-        // Already loaded
-        if (this.config) {
-            this._initConfig(this.config);
-            return;
-        }
-        // Load from document.ccConfig
-        if (document["ccConfig"]) {
-            this._initConfig(document["ccConfig"]);
-        }
-        // Load from project.json
-        else {
-            var data = {};
-            try {
-                var cocos_script = document.getElementsByTagName('script');
-                for(var i = 0; i < cocos_script.length; i++){
-                    var _t = cocos_script[i].getAttribute('cocos');
-                    if(_t === '' || _t) {
-                        break;
-                    }
-                }
-                var _src, txt, _resPath;
-                if(i < cocos_script.length){
-                    _src = cocos_script[i].src;
-                    if(_src){
-                        _resPath = /(.*)\//.exec(_src)[0];
-                        cc.loader.resPath = _resPath;
-                        _src = cc.path.join(_resPath, 'project.json');
-                    }
-                    txt = cc.loader._loadTxtSync(_src);
-                }
-                if(!txt){
-                    txt = cc.loader._loadTxtSync("project.json");
-                }
-                data = JSON.parse(txt);
-            } catch (e) {
-                cc.log("Failed to read or parse project.json");
-            }
-            this._initConfig(data || {});
-        }
-    },
-
     _initConfig: function (config) {
         var CONFIG_KEY = this.CONFIG_KEY,
             modules = config[CONFIG_KEY.modules];
@@ -635,138 +588,21 @@ var game = {
         this.config = config;
     },
 
-    _initRenderer: function (width, height) {
+    _initRenderer: function () {
         // Avoid setup to be called twice.
         if (this._rendererInitialized) return;
 
         if (!cc._supportRender) {
             throw new Error("The renderer doesn't support the renderMode " + this.config[this.CONFIG_KEY.renderMode]);
         }
-
-        var el = this.config[game.CONFIG_KEY.id],
-            win = window,
-            element = cc.$(el) || cc.$('#' + el),
-            localCanvas, localContainer, localConStyle;
-
-        if (element.tagName === "CANVAS") {
-            width = width || element.width;
-            height = height || element.height;
-
-            //it is already a canvas, we wrap it around with a div
-            this.canvas = cc._canvas = localCanvas = element;
-            this.container = cc.container = localContainer = document.createElement("DIV");
-            if (localCanvas.parentNode)
-                localCanvas.parentNode.insertBefore(localContainer, localCanvas);
-        } else {
-            //we must make a new canvas and place into this element
-            if (element.tagName !== "DIV") {
-                cc.log("Warning: target element is not a DIV or CANVAS");
-            }
-            width = width || element.clientWidth;
-            height = height || element.clientHeight;
-            this.canvas = cc._canvas = localCanvas = document.createElement("CANVAS");
-            this.container = cc.container = localContainer = document.createElement("DIV");
-            element.appendChild(localContainer);
-        }
-        localContainer.setAttribute('id', 'Cocos2dGameContainer');
-        localContainer.appendChild(localCanvas);
-        this.frame = (localContainer.parentNode === document.body) ? document.documentElement : localContainer.parentNode;
-
-        localCanvas.addClass("gameCanvas");
-        localCanvas.setAttribute("width", width || 480);
-        localCanvas.setAttribute("height", height || 320);
-        localCanvas.setAttribute("tabindex", 99);
-
-        if (cc._renderType === game.RENDER_TYPE_WEBGL) {
-            this._renderContext = cc._renderContext = cc.webglContext
-             = cc.create3DContext(localCanvas, {
-                'stencil': true,
-                'antialias': !cc.sys.isMobile,
-                'alpha': true
-            });
-        }
-        // WebGL context created successfully
-        if (this._renderContext) {
-            cc.renderer = cc.rendererWebGL;
-            win.gl = this._renderContext; // global variable declared in CCMacro.js
-            cc.renderer.init();
-            cc.shaderCache._init();
-            cc._drawingUtil = new cc.DrawingPrimitiveWebGL(this._renderContext);
-            cc.textureCache._initializingRenderer();
-            cc.glExt = {};
-            cc.glExt.instanced_arrays = win.gl.getExtension("ANGLE_instanced_arrays");
-            cc.glExt.element_uint = win.gl.getExtension("OES_element_index_uint");
-        } else {
-            cc._renderType = game.RENDER_TYPE_CANVAS;
-            cc.renderer = cc.rendererCanvas;
-            cc.renderer.init();
-            this._renderContext = cc._renderContext = new cc.CanvasContextWrapper(localCanvas.getContext("2d"));
-            cc._drawingUtil = cc.DrawingPrimitiveCanvas ? new cc.DrawingPrimitiveCanvas(this._renderContext) : null;
-        }
-
-        cc._gameDiv = localContainer;
-        game.canvas.oncontextmenu = function () {
-            if (!cc._isContextMenuEnable) return false;
-        };
+        cc._renderType = game.RENDER_TYPE_CANVAS;
+        cc.renderer = cc.rendererCanvas;
+        cc.renderer.init();
+        this._renderContext = cc._renderContext = new cc.CanvasContextWrapper(wx.createContext());
 
         this.emit(this.EVENT_RENDERER_INITED, true);
 
         this._rendererInitialized = true;
-    },
-
-    _initEvents: function () {
-        var win = window, hidden, visibilityChange, _undef = "undefined";
-
-        // register system events
-        if (this.config[this.CONFIG_KEY.registerSystemEvent])
-            cc.inputManager.registerSystemEvent(this.canvas);
-
-        if (typeof document.hidden !== 'undefined') {
-            hidden = "hidden";
-            visibilityChange = "visibilitychange";
-        } else if (typeof document.mozHidden !== 'undefined') {
-            hidden = "mozHidden";
-            visibilityChange = "mozvisibilitychange";
-        } else if (typeof document.msHidden !== 'undefined') {
-            hidden = "msHidden";
-            visibilityChange = "msvisibilitychange";
-        } else if (typeof document.webkitHidden !== 'undefined') {
-            hidden = "webkitHidden";
-            visibilityChange = "webkitvisibilitychange";
-        }
-
-        var onHidden = function () {
-            game.emit(game.EVENT_HIDE, game);
-        };
-        var onShow = function () {
-            game.emit(game.EVENT_SHOW, game);
-        };
-
-        if (hidden) {
-            document.addEventListener(visibilityChange, function () {
-                if (document[hidden]) onHidden();
-                else onShow();
-            }, false);
-        } else {
-            win.addEventListener("blur", onHidden, false);
-            win.addEventListener("focus", onShow, false);
-        }
-
-        if(navigator.userAgent.indexOf("MicroMessenger") > -1){
-            win.onfocus = function(){ onShow() };
-        }
-
-        if ("onpageshow" in window && "onpagehide" in window) {
-            win.addEventListener("pagehide", onHidden, false);
-            win.addEventListener("pageshow", onShow, false);
-        }
-
-        this.on(game.EVENT_HIDE, function () {
-            game.pause();
-        });
-        this.on(game.EVENT_SHOW, function () {
-            game.resume();
-        });
     }
 };
 

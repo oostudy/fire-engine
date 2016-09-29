@@ -28,16 +28,16 @@ var isPlainEmptyObj = require('./utils').isPlainEmptyObj_DEV;
 
 function createAttrsSingle (owner, ownerCtor, superAttrs) {
     var AttrsCtor;
-    if (CC_DEV) {
-        var ctorName = ownerCtor.name + '_ATTRS';
-        if (owner !== ownerCtor) {
-            ctorName += '_INSTANCE';
-        }
-        AttrsCtor = eval('(function ' + ctorName + '(){})');
-    }
-    else {
+    // if (CC_DEV) {
+    //     var ctorName = ownerCtor.name + '_ATTRS';
+    //     if (owner !== ownerCtor) {
+    //         ctorName += '_INSTANCE';
+    //     }
+    //     AttrsCtor = eval('(function ' + ctorName + '(){})');
+    // }
+    // else {
         AttrsCtor = function () {};
-    }
+    // }
     if (superAttrs) {
         JS.extend(AttrsCtor, superAttrs.constructor);
     }

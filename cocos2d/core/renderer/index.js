@@ -24,5 +24,4 @@
  ****************************************************************************/
  
 require('./RendererCanvas');
-require('./RendererWebGL');
 require('./DirtyRegion');

@@ -156,7 +156,7 @@ function createItem (id) {
 }
 
 function getXMLHttpRequest () {
-    return window.XMLHttpRequest ? new window.XMLHttpRequest() : new ActiveXObject('MSXML2.XMLHTTP');
+    return XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('MSXML2.XMLHTTP');
 }
 
 /**
