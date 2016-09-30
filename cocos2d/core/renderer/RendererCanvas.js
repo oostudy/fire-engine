@@ -165,7 +165,6 @@ cc.rendererCanvas = {
             this._beginDrawDirtyRegion(wrapper);
         }
 
-        ctx.save();
         ctx.clearActions();
         ctx.clearRect(0, 0, viewport.width, viewport.height);
         if (this._clearColor.r !== 0 ||
@@ -207,8 +206,6 @@ cc.rendererCanvas = {
             canvasId: cc.game.config.id,
             actions: ctx.getActions()
         });
-
-        ctx.restore();
 
         dirtyRegion.clear();
         this._allNeedDraw = false;
@@ -322,10 +319,10 @@ cc.rendererCanvas = {
     };
 
     proto.restore = function () {
-        wx.drawCanvas({
-            canvasId: cc.game.config.id,
-            actions: this._context.getActions()
-        });
+        // wx.drawCanvas({
+        //     canvasId: cc.game.config.id,
+        //     actions: this._context.getActions()
+        // });
         this._context.restore();
         this._saveCount--;
     };

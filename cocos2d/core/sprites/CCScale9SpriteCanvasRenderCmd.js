@@ -66,6 +66,10 @@ proto.rendering = function (ctx, scaleX, scaleY) {
     // wrapper.setTransform(this._worldTransform, scaleX, scaleY);
     // wrapper.setCompositeOperation(_ccsg.Node.CanvasRenderCmd._getCompositeOperationByBlendFunc(node._blendFunc));
     // wrapper.setGlobalAlpha(alpha);
+    var t = this._worldTransform;
+    var scale = Math.sqrt(t.a * t.a + t.c * t.c) * scaleX;
+    var tx = wrapper._offsetX + t.tx * scaleX;
+    var ty = wrapper._realOffsetY - (t.ty * scaleY);
 
     if (this._textureToRender) {
         if (node._quadsDirty) {
@@ -80,7 +84,7 @@ proto.rendering = function (ctx, scaleX, scaleY) {
         h = vertices[7] - y;
         y = -y - h;
         if (w > 0 && h > 0) {
-            context.drawImage(this._textureToRender, x, y, w, h);
+            context.drawImage(this._textureToRender, tx + x, ty + y, w * scale, h * scale);
         }
         cc.g_NumberOfDraws ++;
     }
