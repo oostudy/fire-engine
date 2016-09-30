@@ -168,7 +168,7 @@ cc.SpriteFrame = cc.Class(/** @lends cc.SpriteFrame# */{
 
         this._texture = null;
         this._textureFilename = '';
-        this._textureLoaded = false;
+        this._textureLoaded = true;
 
         if (CC_EDITOR) {
             // Atlas asset uuid

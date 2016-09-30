@@ -560,8 +560,10 @@ function _createCtor (ctor, baseClass, mixins, className, options) {
         this._super = null;
         instantiateProps(this, fireClass);
         var cs = fireClass.__ctors__;
-        for (var i = 0, l = cs.length; i < l; ++i) {
-            cs[i].apply(this, arguments);
+        if (cs) {
+            for (var i = 0, l = cs.length; i < l; ++i) {
+                cs[i].apply(this, arguments);
+            }
         }
     }
 

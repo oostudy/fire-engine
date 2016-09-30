@@ -148,8 +148,7 @@ cc.rendererCanvas = {
         var dirtyRegion = this._dirtyRegion = this._dirtyRegion || new cc.DirtyRegion();
         var viewport = cc.view._frameSize;
         var wrapper = ctxWrapper || cc._renderContext;
-        var ctx = wx.createContext();
-        wrapper._context = ctx;
+        var ctx = wrapper.getContext();
 
         var scaleX = cc.view.getScaleX(),
             scaleY = cc.view.getScaleY();
@@ -166,7 +165,7 @@ cc.rendererCanvas = {
             this._beginDrawDirtyRegion(wrapper);
         }
 
-        // ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.save();
         ctx.clearActions();
         ctx.clearRect(0, 0, viewport.width, viewport.height);
         if (this._clearColor.r !== 0 ||
@@ -208,6 +207,8 @@ cc.rendererCanvas = {
             canvasId: cc.game.config.id,
             actions: ctx.getActions()
         });
+
+        ctx.restore();
 
         dirtyRegion.clear();
         this._allNeedDraw = false;
@@ -321,6 +322,10 @@ cc.rendererCanvas = {
     };
 
     proto.restore = function () {
+        wx.drawCanvas({
+            canvasId: cc.game.config.id,
+            actions: this._context.getActions()
+        });
         this._context.restore();
         this._saveCount--;
     };
@@ -363,7 +368,16 @@ cc.rendererCanvas = {
     };
 
     proto.setTransform = function(t, scaleX, scaleY){
-        this._context.setTransform(t.a * scaleX, -t.b * scaleY, -t.c * scaleX, t.d * scaleY, this._offsetX + t.tx * scaleX, this._realOffsetY - (t.ty * scaleY));
+        var sx = Math.sqrt(t.a * t.a + t.c * t.c) * scaleX;
+        var sy = Math.sqrt(t.b * t.b + t.d * t.d) * scaleY;
+        var rotation = Math.atan((-t.c * scaleX) / (t.d * scaleY));
+        var tx = this._offsetX + t.tx * scaleX;
+        var ty = this._realOffsetY - (t.ty * scaleY);
+        var ctx = this._context;
+        ctx.translate(tx, ty);
+        ctx.rotate(rotation);
+        ctx.scale(sx, sy);
+        // this._context.setTransform(t.a * scaleX, -t.b * scaleY, -t.c * scaleX, t.d * scaleY, this._offsetX + t.tx * scaleX, this._realOffsetY - (t.ty * scaleY));
     };
 })();
 

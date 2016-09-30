@@ -265,8 +265,8 @@ var scale9QuadGenerator = {
     _calculateUVs: function (sprite, spriteFrame, insetLeft, insetRight, insetTop, insetBottom) {
         var uvs = sprite._uvs;
         var rect = spriteFrame._rect;
-        var atlasWidth = spriteFrame._texture._pixelWidth;
-        var atlasHeight = spriteFrame._texture._pixelHeight;
+        var atlasWidth = spriteFrame._rect.width;
+        var atlasHeight = spriteFrame._rect.height;
 
         //caculate texture coordinate
         var leftWidth, centerWidth, rightWidth;
@@ -728,33 +728,6 @@ cc.Scale9Sprite = _ccsg.Node.extend({
             this._renderCmd._needDraw = false;
             cc.error('Can not generate quad');
             return;
-        }
-
-        // Culling
-        if (webgl) {
-            var vert = this._isTriangle ? this._rawVerts : this._vertices,
-                x0 = vert[cornerId[0]], x1 = vert[cornerId[1]], x2 = vert[cornerId[2]], x3 = vert[cornerId[3]],
-                y0 = vert[cornerId[0]+1], y1 = vert[cornerId[1]+1], y2 = vert[cornerId[2]+1], y3 = vert[cornerId[3]+1];
-            if (((x0-vl.x) & (x1-vl.x) & (x2-vl.x) & (x3-vl.x)) >> 31 || // All outside left
-                ((vr.x-x0) & (vr.x-x1) & (vr.x-x2) & (vr.x-x3)) >> 31 || // All outside right
-                ((y0-vb.y) & (y1-vb.y) & (y2-vb.y) & (y3-vb.y)) >> 31 || // All outside bottom
-                ((vt.y-y0) & (vt.y-y1) & (vt.y-y2) & (vt.y-y3)) >> 31)   // All outside top
-            {
-                this._renderCmd._needDraw = false;
-            }
-            else {
-                this._renderCmd._needDraw = true;
-            }
-        }
-        else {
-            var bb = this._renderCmd._currentRegion,
-                l = bb._minX, r = bb._maxX, b = bb._minY, t = bb._maxY;
-            if (r < vl.x || l > vr.x || t < vb.y || b > vt.y) {
-                this._renderCmd._needDraw = false;
-            }
-            else {
-                this._renderCmd._needDraw = true;
-            }
         }
 
         this._quadsDirty = false;

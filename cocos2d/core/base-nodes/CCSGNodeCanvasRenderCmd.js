@@ -446,22 +446,22 @@ _ccsg.Node.RenderCmd.prototype = {
 
     updateStatus: function () {
         var locFlag = this._dirtyFlag;
-        var colorDirty = locFlag & dirtyFlags.colorDirty,
-            opacityDirty = locFlag & dirtyFlags.opacityDirty;
+        // var colorDirty = locFlag & dirtyFlags.colorDirty,
+        //     opacityDirty = locFlag & dirtyFlags.opacityDirty;
 
         if (locFlag & dirtyFlags.contentDirty) {
             this._notifyRegionStatus && this._notifyRegionStatus(_ccsg.Node.CanvasRenderCmd.RegionStatus.Dirty);
             this._dirtyFlag &= ~dirtyFlags.contentDirty;
         }
 
-        if (colorDirty)
-            this._updateDisplayColor();
+        // if (colorDirty)
+        //     this._updateDisplayColor();
 
-        if (opacityDirty)
-            this._updateDisplayOpacity();
+        // if (opacityDirty)
+        //     this._updateDisplayOpacity();
 
-        if (colorDirty || opacityDirty)
-            this._updateColor();
+        // if (colorDirty || opacityDirty)
+        //     this._updateColor();
 
         if (locFlag & dirtyFlags.transformDirty) {
             //update the transform
@@ -475,19 +475,19 @@ _ccsg.Node.RenderCmd.prototype = {
         //  Because child elements need parent's _dirtyFlag to change himself
         var locFlag = this._dirtyFlag;
 
-        var colorDirty = locFlag & dirtyFlags.colorDirty,
-            opacityDirty = locFlag & dirtyFlags.opacityDirty;
+        // var colorDirty = locFlag & dirtyFlags.colorDirty,
+        //     opacityDirty = locFlag & dirtyFlags.opacityDirty;
 
-        if (colorDirty)
-            //update the color
-            this._syncDisplayColor();
+        // if (colorDirty)
+        //     //update the color
+        //     this._syncDisplayColor();
 
-        if (opacityDirty)
-            //update the opacity
-            this._syncDisplayOpacity();
+        // if (opacityDirty)
+        //     //update the opacity
+        //     this._syncDisplayOpacity();
 
-        if (colorDirty || opacityDirty)
-            this._updateColor();
+        // if (colorDirty || opacityDirty)
+        //     this._updateColor();
 
         if (locFlag & dirtyFlags.transformDirty)
             //update the transform

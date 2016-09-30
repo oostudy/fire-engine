@@ -24,12 +24,7 @@
 
 cc.Scale9Sprite.CanvasRenderCmd = function (renderable) {
     _ccsg.Node.CanvasRenderCmd.call(this, renderable);
-    if (this._node.loaded()) {
-        this._needDraw = true;
-    }
-    else {
-        this._needDraw = false;
-    }
+    this._needDraw = true;
     this._state = cc.Scale9Sprite.state.NORMAL;
     this._originalTexture = this._textureToRender = null;
 };
@@ -57,7 +52,7 @@ proto.setState = function(state){
 proto.rendering = function (ctx, scaleX, scaleY) {
     var node = this._node;
     var locDisplayOpacity = this._displayedOpacity;
-    var alpha =  locDisplayOpacity/ 255;
+    // var alpha =  locDisplayOpacity/ 255;
     var locTexture = null;
     if (node._spriteFrame) locTexture = node._spriteFrame._textureFilename;
     if (!node.loaded() || locDisplayOpacity === 0)
@@ -67,9 +62,10 @@ proto.rendering = function (ctx, scaleX, scaleY) {
     }
 
     var wrapper = ctx || cc._renderContext, context = wrapper.getContext();
-    wrapper.setTransform(this._worldTransform, scaleX, scaleY);
-    wrapper.setCompositeOperation(_ccsg.Node.CanvasRenderCmd._getCompositeOperationByBlendFunc(node._blendFunc));
-    wrapper.setGlobalAlpha(alpha);
+    wrapper.save();
+    // wrapper.setTransform(this._worldTransform, scaleX, scaleY);
+    // wrapper.setCompositeOperation(_ccsg.Node.CanvasRenderCmd._getCompositeOperationByBlendFunc(node._blendFunc));
+    // wrapper.setGlobalAlpha(alpha);
 
     if (this._textureToRender) {
         if (node._quadsDirty) {
@@ -77,41 +73,16 @@ proto.rendering = function (ctx, scaleX, scaleY) {
         }
         var x, y, w,h;
         var vertices = node._vertices;
-        var i = 0, off = 0;
-        
-        if (node._renderingType === cc.Scale9Sprite.RenderingType.SLICED) {
-            // Sliced use a special vertices layout 16 vertices for 9 quads
-            for (var r = 0; r < 3; ++r) {
-                for (var c = 0; c < 3; ++c) {
-                    off = r*8 + c*2;
-                    x = vertices[off];
-                    y = vertices[off+1];
-                    w = vertices[off+10] - x;
-                    h = vertices[off+11] - y;
-                    y = - y - h;
 
-                    if (w > 0 && h > 0) {
-                        context.drawImage(this._textureToRender, x, y, w, h);
-                    }
-                }
-            }
-            cc.g_NumberOfDraws += 9;
+        x = vertices[0];
+        y = vertices[1];
+        w = vertices[6] - x;
+        h = vertices[7] - y;
+        y = -y - h;
+        if (w > 0 && h > 0) {
+            context.drawImage(this._textureToRender, x, y, w, h);
         }
-        else {
-            var quadCount = Math.floor(node._vertCount / 4);
-            for (i = 0, off = 0; i < quadCount; i++) {
-                x = vertices[off];
-                y = vertices[off+1];
-                w = vertices[off+6] - x;
-                h = vertices[off+7] - y;
-                y = - y - h;
-
-                if (w > 0 && h > 0) {
-                    context.drawImage(this._textureToRender, x, y, w, h);
-                }
-                off += 8;
-            }
-            cc.g_NumberOfDraws += quadCount;
-        }
+        cc.g_NumberOfDraws ++;
     }
+    wrapper.restore();
 };
