@@ -33,20 +33,20 @@
 
     proto.updateStatus = function () {
         var flags = _ccsg.Node._dirtyFlags, locFlag = this._dirtyFlag;
-        var colorDirty = locFlag & flags.colorDirty,
-            opacityDirty = locFlag & flags.opacityDirty;
+        // var colorDirty = locFlag & flags.colorDirty,
+        //     opacityDirty = locFlag & flags.opacityDirty;
 
-        if (colorDirty) 
-            this._updateDisplayColor();
-        if (opacityDirty)
-            this._updateDisplayOpacity();
+        // if (colorDirty) 
+        //     this._updateDisplayColor();
+        // if (opacityDirty)
+        //     this._updateDisplayOpacity();
 
         if(locFlag & dirtyFlags.contentDirty) {
             this._notifyRegionStatus && this._notifyRegionStatus(_ccsg.Node.CanvasRenderCmd.RegionStatus.Dirty);
             this._dirtyFlag &= ~dirtyFlags.contentDirty;
         }
 
-        if (colorDirty || opacityDirty || (locFlag & flags.textDirty)) {
+        if (/*colorDirty || opacityDirty || */(locFlag & flags.textDirty)) {
             this._notifyRegionStatus && this._notifyRegionStatus(_ccsg.Node.CanvasRenderCmd.RegionStatus.Dirty);
             this._rebuildLabelSkin();
         }
@@ -62,26 +62,26 @@
         var flags = _ccsg.Node._dirtyFlags, locFlag = this._dirtyFlag;
         var parentNode = parentCmd ? parentCmd._node : null;
 
-        if (parentNode && parentNode._cascadeColorEnabled && (parentCmd._dirtyFlag & flags.colorDirty))
-            locFlag |= flags.colorDirty;
+        // if (parentNode && parentNode._cascadeColorEnabled && (parentCmd._dirtyFlag & flags.colorDirty))
+        //     locFlag |= flags.colorDirty;
 
-        if (parentNode && parentNode._cascadeOpacityEnabled && (parentCmd._dirtyFlag & flags.opacityDirty))
-            locFlag |= flags.opacityDirty;
+        // if (parentNode && parentNode._cascadeOpacityEnabled && (parentCmd._dirtyFlag & flags.opacityDirty))
+        //     locFlag |= flags.opacityDirty;
 
         if (parentCmd && (parentCmd._dirtyFlag & flags.transformDirty))
             locFlag |= flags.transformDirty;
 
-        var colorDirty = locFlag & flags.colorDirty,
-            opacityDirty = locFlag & flags.opacityDirty;
+        // var colorDirty = locFlag & flags.colorDirty,
+        //     opacityDirty = locFlag & flags.opacityDirty;
 
         this._dirtyFlag = locFlag;
 
-        if (colorDirty)
-            this._syncDisplayColor();
-        if (opacityDirty)
-            this._syncDisplayOpacity();
+        // if (colorDirty)
+        //     this._syncDisplayColor();
+        // if (opacityDirty)
+        //     this._syncDisplayOpacity();
 
-        if (colorDirty || opacityDirty || (this._dirtyFlag & flags.textDirty)) {
+        if (/*colorDirty || opacityDirty || */(this._dirtyFlag & flags.textDirty)) {
             this._rebuildLabelSkin();
         }
 
@@ -295,37 +295,37 @@
             _ccsg.Node.prototype.setContentSize.call(node, this._canvasSize);
         }
 
-        this._labelCanvas.width = this._canvasSize.width;
-        this._labelCanvas.height = this._canvasSize.height;
+        // this._labelCanvas.width = this._canvasSize.width;
+        // this._labelCanvas.height = this._canvasSize.height;
 
     };
 
     proto._calculateFillTextStartPosition = function() {
         var node = this._node;
         var lineHeight = this._getLineHeight();
-        var lineCount = this._splitedStrings.length;
+        var lineCount = 1;
         var labelX;
         var firstLinelabelY;
 
-        if (cc.TextAlignment.RIGHT === node._hAlign) {
-            labelX = this._canvasSize.width - this._getMargin();
-        }
-        else if (cc.TextAlignment.CENTER === node._hAlign) {
-            labelX = this._canvasSize.width / 2;
-        }
-        else {
+        // if (cc.TextAlignment.RIGHT === node._hAlign) {
+        //     labelX = this._canvasSize.width - this._getMargin();
+        // }
+        // else if (cc.TextAlignment.CENTER === node._hAlign) {
+        //     labelX = this._canvasSize.width / 2;
+        // }
+        // else {
             labelX = 0 + this._getMargin();
-        }
+        // }
 
-        if (cc.VerticalTextAlignment.TOP === node._vAlign) {
+        // if (cc.VerticalTextAlignment.TOP === node._vAlign) {
             firstLinelabelY = 0;
-        }
-        else if (cc.VerticalTextAlignment.CENTER === node._vAlign) {
-            firstLinelabelY = this._canvasSize.height / 2 - lineHeight * (lineCount - 1) / 2;
-        }
-        else {
-            firstLinelabelY = this._canvasSize.height - lineHeight * (lineCount - 1);
-        }
+        // }
+        // else if (cc.VerticalTextAlignment.CENTER === node._vAlign) {
+        //     firstLinelabelY = this._canvasSize.height / 2 - lineHeight * (lineCount - 1) / 2;
+        // }
+        // else {
+        //     firstLinelabelY = this._canvasSize.height - lineHeight * (lineCount - 1);
+        // }
 
         return cc.p(labelX, firstLinelabelY);
     };
@@ -359,18 +359,18 @@
     };
 
     proto._bakeLabel = function () {
-        var node = this._node;
-        this._drawFontsize = node._drawFontsize;
-        this._canvasSize = this._calculateCanvasSize();
+        // var node = this._node;
+        // this._drawFontsize = node._drawFontsize;
+        // this._canvasSize = this._calculateCanvasSize();
 
-        //Note: don't change the calling order of the following 3 statements
-        this._fontDesc = this._calculateLabelFont();
-        this._calculateSplitedStrings();
-        this._updateLabelDimensions();
+        // //Note: don't change the calling order of the following 3 statements
+        // this._fontDesc = this._calculateLabelFont();
+        // this._calculateSplitedStrings();
+        // this._updateLabelDimensions();
 
-        this._calculateTextBaseline();
+        // this._calculateTextBaseline();
 
-        this._updateTexture();
+        // this._updateTexture();
 
     };
 
@@ -397,17 +397,17 @@
         return cc.p(labelX, firstLinelabelY);
     };
 
-    proto._updateTexture = function() {
-        this._labelContext.clearRect(0, 0, this._labelCanvas.width, this._labelCanvas.height);
+    proto._updateTexture = function(ctx) {
+        // ctx.clearRect(0, 0, this._labelCanvas.width, this._labelCanvas.height);
 
-        this._labelContext.font = this._fontDesc;
+        ctx.font = this._fontDesc;
 
         var startPosition = this._calculateFillTextStartPosition();
         var lineHeight = this._getLineHeight();
         //use round for line join to avoid sharp intersect point
-        this._labelContext.lineJoin = 'round';
+        ctx.lineJoin = 'round';
         var color = this._displayedColor;
-        this._labelContext.fillStyle = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+        ctx.fillStyle = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
         var underlineStartPosition;
 
         //do real rendering
@@ -415,23 +415,23 @@
             if(this._node.isOutlined())
             {
                 var strokeColor = this._node.getOutlineColor() || cc.color(255,255,255,255);
-                this._labelContext.globalCompositeOperation = 'source-over';
-                this._labelContext.strokeStyle = 'rgb(' + strokeColor.r + ',' + strokeColor.g + ',' + strokeColor.b + ')';
-                this._labelContext.lineWidth = this._node.getOutlineWidth() * 2;
-                this._labelContext.strokeText(this._splitedStrings[i],
+                // ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = 'rgb(' + strokeColor.r + ',' + strokeColor.g + ',' + strokeColor.b + ')';
+                ctx.lineWidth = this._node.getOutlineWidth() * 2;
+                ctx.strokeText(this._splitedStrings[i],
                                               startPosition.x, startPosition.y + i * lineHeight);
             }
-            this._labelContext.fillText(this._splitedStrings[i], startPosition.x, startPosition.y + i * lineHeight);
+            ctx.fillText(this._splitedStrings[i], startPosition.x, startPosition.y + i * lineHeight);
             if(this._node._isUnderline) {
                 underlineStartPosition = this._calculateUnderlineStartPosition();
-                this._labelContext.save();
-                this._labelContext.beginPath();
-                this._labelContext.lineWidth = this._node._fontSize / 8;
-                this._labelContext.strokeStyle = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
-                this._labelContext.moveTo(underlineStartPosition.x, underlineStartPosition.y + i * lineHeight - 1);
-                this._labelContext.lineTo(underlineStartPosition.x + this._labelCanvas.width, underlineStartPosition.y + i * lineHeight - 1);
-                this._labelContext.stroke();
-                this._labelContext.restore();
+                // ctx.save();
+                ctx.beginPath();
+                ctx.lineWidth = this._node._fontSize / 8;
+                ctx.strokeStyle = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+                ctx.moveTo(underlineStartPosition.x, underlineStartPosition.y + i * lineHeight - 1);
+                ctx.lineTo(underlineStartPosition.x + this._labelCanvas.width, underlineStartPosition.y + i * lineHeight - 1);
+                ctx.stroke();
+                // ctx.restore();
             }
         }
 
@@ -450,12 +450,12 @@
     _ccsg.Label.CanvasRenderCmd = function (renderableObject) {
         _ccsg.Node.CanvasRenderCmd.call(this, renderableObject);
         this._needDraw = true;
-        this._texture = new cc.Texture2D();
-        this._labelCanvas = document.createElement('canvas');
-        this._labelCanvas.width = 1;
-        this._labelCanvas.height = 1;
-        this._labelContext = this._labelCanvas.getContext('2d');
-        this._texture.initWithElement(this._labelCanvas);
+        // this._texture = new cc.Texture2D();
+        // this._labelCanvas = document.createElement('canvas');
+        // this._labelCanvas.width = 1;
+        // this._labelCanvas.height = 1;
+        // this._labelContext = this._labelCanvas.getContext('2d');
+        // this._texture.initWithElement(this._labelCanvas);
         this._splitedStrings = null;
     };
 
@@ -485,48 +485,71 @@
         if (node._labelType === _ccsg.Label.Type.TTF ||
             node._labelType === _ccsg.Label.Type.SystemFont) {
             var locDisplayOpacity = this._displayedOpacity;
-            var alpha = locDisplayOpacity / 255;
+            // var alpha = locDisplayOpacity / 255;
 
             if (locDisplayOpacity === 0)
                 return;
 
             var wrapper = ctx || cc._renderContext,
-                context = wrapper.getContext();
+                ctx = wrapper.getContext();
+            wrapper.save();
             wrapper.setTransform(this._worldTransform, scaleX, scaleY);
-            wrapper.setCompositeOperation(_ccsg.Node.CanvasRenderCmd._getCompositeOperationByBlendFunc(node._blendFunc));
-            wrapper.setGlobalAlpha(alpha);
+            // wrapper.setCompositeOperation(_ccsg.Node.CanvasRenderCmd._getCompositeOperationByBlendFunc(node._blendFunc));
+            // wrapper.setGlobalAlpha(alpha);
 
-            if (this._texture) {
-                var sx, sy, sw, sh;
-                var x, y, w, h;
+            // ctx.font = this._fontDesc;
+            ctx.setFontSize(node._fontSize);
 
-                x = 0;
-                y = -this._node._contentSize.height;
-                w = this._node._contentSize.width;
-                h = this._node._contentSize.height;
+            var startPosition = this._calculateFillTextStartPosition();
+            // var lineHeight = this._getLineHeight();
+            //use round for line join to avoid sharp intersect point
+            ctx.lineJoin = 'round';
+            var color = this._displayedColor;
+            ctx.fillStyle = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
 
-
-                var textureWidth = this._texture.getPixelWidth();
-                var textureHeight = this._texture.getPixelHeight();
-
-                sx = 0;
-                sy = 0;
-                sw = textureWidth;
-                sh = textureHeight;
-
-                var image = this._texture._htmlElementObj;
-                if (this._texture._pattern !== '') {
-                    wrapper.setFillStyle(context.createPattern(image, this._texture._pattern));
-                    context.fillRect(x, y, w, h);
-                }
-                else {
-                    if(sw !== 0 && sh !== 0 && w !== 0 && h !== 0) {
-                        context.drawImage(image,
-                            sx, sy, sw, sh,
-                            x, y, w, h);
-                    }
-                }
+            //do real rendering
+            if(this._node.isOutlined())
+            {
+                var strokeColor = this._node.getOutlineColor() || cc.color(255,255,255,255);
+                // ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = 'rgb(' + strokeColor.r + ',' + strokeColor.g + ',' + strokeColor.b + ')';
+                ctx.lineWidth = this._node.getOutlineWidth() * 2;
+                ctx.strokeText(this._node._string, startPosition.x, startPosition.y);
             }
+            ctx.fillText(this._node._string, startPosition.x, startPosition.y);
+            wrapper.restore();
+
+            // if (this._texture) {
+            //     var sx, sy, sw, sh;
+            //     var x, y, w, h;
+
+            //     x = 0;
+            //     y = -this._node._contentSize.height;
+            //     w = this._node._contentSize.width;
+            //     h = this._node._contentSize.height;
+
+
+            //     var textureWidth = this._texture.getPixelWidth();
+            //     var textureHeight = this._texture.getPixelHeight();
+
+            //     sx = 0;
+            //     sy = 0;
+            //     sw = textureWidth;
+            //     sh = textureHeight;
+
+            //     var image = this._texture._htmlElementObj;
+            //     if (this._texture._pattern !== '') {
+            //         wrapper.setFillStyle(context.createPattern(image, this._texture._pattern));
+            //         context.fillRect(x, y, w, h);
+            //     }
+            //     else {
+            //         if(sw !== 0 && sh !== 0 && w !== 0 && h !== 0) {
+            //             context.drawImage(image,
+            //                 sx, sy, sw, sh,
+            //                 x, y, w, h);
+            //         }
+            //     }
+            // }
             cc.g_NumberOfDraws = cc.g_NumberOfDraws + 1;
         }
 

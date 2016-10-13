@@ -278,7 +278,29 @@ cc.rendererCanvas = {
         this._offsetX = 0;
         this._offsetY = 0;
         this._realOffsetY = this.height;
+
+        this._trs = [];
+
+        this._lastTRS = null;
         // this._armatureMode = 0;
+
+        // context._translate = context.translate;
+        // context.translate = function (x, y) {
+        //     this._translate(x, y);
+        //     console.log('****** Translation: ' + x + ', ' + y);
+        // };
+
+        // context._rotate = context.rotate;
+        // context.rotate = function (r) {
+        //     this._rotate(r);
+        //     console.log('****** Rotation: ' + r);
+        // };
+
+        // context._scale = context.scale;
+        // context.scale = function (x, y) {
+        //     this._scale(x, y);
+        //     console.log('****** Scale: ' + x + ', ' + y);
+        // };
     };
 
     var proto = cc.CanvasContextWrapper.prototype;
@@ -314,16 +336,30 @@ cc.rendererCanvas = {
     };
 
     proto.save = function () {
-        this._context.save();
+        // this._context.save();
+        this._lastTRS = {};
+        this._trs.push(this._lastTRS);
         this._saveCount++;
     };
 
     proto.restore = function () {
-        // wx.drawCanvas({
-        //     canvasId: cc.game.config.id,
-        //     actions: this._context.getActions()
-        // });
-        this._context.restore();
+        // this._context.restore();
+        var trs = this._trs.pop();
+        if (trs) {
+            var ctx = this._context;
+            if (trs.scale) {
+                ctx.scale(1 / trs.scale.x, 1 / trs.scale.y);
+            }
+            if (trs.rotate) {
+                ctx.rotate(-trs.rotate);
+            }
+            if (trs.translate) {
+            ctx.translate(-trs.translate.x, -trs.translate.y);
+            }
+        }
+        if (this._lastTRS) {
+            this._lastTRS = null;
+        }
         this._saveCount--;
     };
 
@@ -371,9 +407,26 @@ cc.rendererCanvas = {
         var tx = this._offsetX + t.tx * scaleX;
         var ty = this._realOffsetY - (t.ty * scaleY);
         var ctx = this._context;
-        ctx.translate(tx, ty);
-        ctx.rotate(rotation);
-        ctx.scale(sx, sy);
+
+        if (tx !== 0 || ty !== 0) {
+            ctx.translate(tx, ty);
+            if (this._lastTRS) {
+                this._lastTRS.translate = {x: tx, y: ty};
+            }
+        }
+        if (rotation !== 0) {
+            ctx.rotate(rotation);
+            if (this._lastTRS) {
+                this._lastTRS.rotate = rotation;
+            }
+        }
+        if (sx !== 1 || sy !== 1) {
+            ctx.scale(sx, sy);
+            if (this._lastTRS) {
+                this._lastTRS.scale = {x: sx, y: sy};
+            }
+        }
+
         // this._context.setTransform(t.a * scaleX, -t.b * scaleY, -t.c * scaleX, t.d * scaleY, this._offsetX + t.tx * scaleX, this._realOffsetY - (t.ty * scaleY));
     };
 })();
