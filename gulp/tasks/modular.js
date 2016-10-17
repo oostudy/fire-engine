@@ -45,11 +45,11 @@ var modules = {
         './cocos2d/core/base-nodes/CCSGNode.js',
         './cocos2d/core/base-nodes/CCSGNodeCanvasRenderCmd.js',
         './cocos2d/core/scenes/CCSGScene.js',
-        './cocos2d/core/scenes/CCLoaderScene.js',
-        './cocos2d/core/layers/CCLayer.js',
-        './cocos2d/core/layers/CCLayerCanvasRenderCmd.js',
-        './cocos2d/core/CCConfiguration.js',
-        './cocos2d/core/CCDrawingPrimitivesCanvas.js'
+        // './cocos2d/core/scenes/CCLoaderScene.js',
+        // './cocos2d/core/layers/CCLayer.js',
+        // './cocos2d/core/layers/CCLayerCanvasRenderCmd.js',
+        // './cocos2d/core/CCConfiguration.js',
+        // './cocos2d/core/CCDrawingPrimitivesCanvas.js'
     ],
 
     'Sprite': [

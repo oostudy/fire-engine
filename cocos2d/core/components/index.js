@@ -36,7 +36,7 @@ module.exports = [
     require('./CCAnimation'),
     require('./CCLabel'),
     require('./CCLayout'),
-    require('./CCSpriteDistortion'),
+    // require('./CCSpriteDistortion'),
     require('./CCLabelOutline'),
     // require('./CCRichText')
 ];
