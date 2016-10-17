@@ -371,10 +371,6 @@ var Label = cc.Class({
                     var textureUrl = isAsset ? value.texture : '';
                     this._sgNode.setFontFileOrFamily(fntRawUrl, textureUrl);
                 }
-
-                if (value instanceof cc.BitmapFont) {
-                    this._bmFontOriginalSize = value.fontSize;
-                }
             },
             type: cc.Font,
             tooltip: 'i18n:COMPONENT.label.font',
@@ -458,9 +454,6 @@ var Label = cc.Class({
         var isAsset = this.font instanceof cc.Font;
         var fntRawUrl = isAsset ? this.font.rawUrl : '';
         var textureUrl = isAsset ? this.font.texture : '';
-        if (this.font instanceof cc.BitmapFont) {
-            this._bmFontOriginalSize = this.font.fontSize;
-        }
 
         var sgNode = this._sgNode = new _ccsg.Label(this.string, fntRawUrl, textureUrl);
         sgNode.setVisible(false);

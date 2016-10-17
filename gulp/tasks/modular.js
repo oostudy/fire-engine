@@ -94,11 +94,11 @@ function wrapFile() {
     var cwd = process.cwd();
     var headerFile = new File({
         cwd: cwd, base: cwd, path: Path.resolve('header.js'),
-        contents: new Buffer('(function (cc, ccui, ccs, cp) {\n')
+        contents: new Buffer('(function (cc, _ccsg) {\n')
     });
     var footerFile = new File({
         cwd: cwd, base: cwd, path: Path.resolve('footer.js'),
-        contents: new Buffer('\n}).call(window, cc, ccui, ccs, cp);\n')
+        contents: new Buffer('\n}).call(window, cc, _ccsg);\n')
     });
     var isHeaderInserted = false;
     return es.through(function (file) {

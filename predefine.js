@@ -31,10 +31,10 @@
  * @module cc
  * @main cc
  */
-cc = {};
+var cc = global.cc || {};
 
 // The namespace for original nodes rendering in scene graph.
-_ccsg = {};
+var _ccsg = global._ccsg || {};
 
 if (CC_DEV) {
     /**
@@ -80,7 +80,3 @@ if (!CC_JSB) {
         require('./cocos2d/core/CCGame');
     }
 }
-
-ccui = {};
-ccs = {};
-cp = {};

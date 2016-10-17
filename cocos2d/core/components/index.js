@@ -38,5 +38,5 @@ module.exports = [
     require('./CCLayout'),
     require('./CCSpriteDistortion'),
     require('./CCLabelOutline'),
-    require('./CCRichText')
+    // require('./CCRichText')
 ];

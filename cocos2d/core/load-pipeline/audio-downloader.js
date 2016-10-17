@@ -26,7 +26,7 @@
 var Path = require('../utils/CCPath');
 var Sys = require('../platform/CCSys');
 var Pipeline = require('./pipeline');
-var audioEngine = require('../../audio/CCAudioEngine');
+// var audioEngine = require('../../audio/CCAudioEngine');
 
 var __audioSupport = Sys.__audioSupport;
 var formatSupport = __audioSupport.format;

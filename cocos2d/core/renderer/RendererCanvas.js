@@ -167,6 +167,8 @@ cc.rendererCanvas = {
 
         ctx.clearActions();
         ctx.clearRect(0, 0, viewport.width, viewport.height);
+        // wrapper.save();
+        // wrapper.setTransform(unitTransform, scaleX, scaleY);
         if (this._clearColor.r !== 0 ||
             this._clearColor.g !== 0 ||
             this._clearColor.b !== 0) {
@@ -201,6 +203,7 @@ cc.rendererCanvas = {
             this._debugDrawDirtyRegion(wrapper);
             this._endDrawDirtyRegion(ctx);
         }
+        // wrapper.restore();
 
         wx.drawCanvas({
             canvasId: cc.game.config.id,
@@ -401,9 +404,11 @@ cc.rendererCanvas = {
     };
 
     proto.setTransform = function(t, scaleX, scaleY){
+        scaleX = scaleX || 1;
+        scaleY = scaleY || 1;
         var sx = Math.sqrt(t.a * t.a + t.c * t.c) * scaleX;
         var sy = Math.sqrt(t.b * t.b + t.d * t.d) * scaleY;
-        var rotation = Math.atan((-t.c * scaleX) / (t.d * scaleY));
+        var rotation = Math.atan((t.c * scaleX) / (t.d * scaleY));
         var tx = this._offsetX + t.tx * scaleX;
         var ty = this._realOffsetY - (t.ty * scaleY);
         var ctx = this._context;

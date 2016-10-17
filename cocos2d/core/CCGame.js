@@ -29,7 +29,7 @@ if (!(CC_EDITOR && Editor.isMainProcess)) {
     View = require('./platform/CCView');
 }
 
-var audioEngine = cc.audioEngine = require('../audio/CCAudioEngine');
+// var audioEngine = cc.audioEngine = require('../audio/CCAudioEngine');
 
 /**
  * !#en An object to boot the game.
@@ -253,9 +253,9 @@ var game = {
         if (this._paused) return;
         this._paused = true;
         // Pause audio engine
-        if (audioEngine) {
-            audioEngine.pauseAll();
-        }
+        // if (audioEngine) {
+        //     audioEngine.pauseAll();
+        // }
         // Pause main loop
         if (this._intervalId)
             cancelAnimationFrame(this._intervalId);
@@ -272,9 +272,9 @@ var game = {
         if (!this._paused) return;
         this._paused = false;
         // Resume audio engine
-        if (audioEngine) {
-            audioEngine.resumeAll();
-        }
+        // if (audioEngine) {
+        //     audioEngine.resumeAll();
+        // }
         // Resume main loop
         this._runMainLoop();
     },
@@ -297,7 +297,7 @@ var game = {
     restart: function () {
         cc.director.popToSceneStackLevel(0);
         // Clean up audio
-        audioEngine && audioEngine.end();
+        // audioEngine && audioEngine.end();
 
         game.onStart();
     },
@@ -495,29 +495,6 @@ var game = {
     _setAnimFrame: function () {
         this._lastTime = new Date();
         this._frameTime = 1000 / game.config[game.CONFIG_KEY.frameRate];
-        if((cc.sys.os === cc.sys.OS_IOS && cc.sys.browserType === cc.sys.BROWSER_TYPE_WECHAT) || game.config[game.CONFIG_KEY.frameRate] !== 60) {
-            requestAnimFrame = this._stTime;
-            cancelAnimationFrame = this._ctTime;
-        }
-        else {
-            requestAnimFrame = requestAnimationFrame ||
-            webkitRequestAnimationFrame ||
-            mozRequestAnimationFrame ||
-            oRequestAnimationFrame ||
-            msRequestAnimationFrame ||
-            this._stTime;
-            cancelAnimationFrame = cancelAnimationFrame ||
-            cancelRequestAnimationFrame ||
-            msCancelRequestAnimationFrame ||
-            mozCancelRequestAnimationFrame ||
-            oCancelRequestAnimationFrame ||
-            webkitCancelRequestAnimationFrame ||
-            msCancelAnimationFrame ||
-            mozCancelAnimationFrame ||
-            webkitCancelAnimationFrame ||
-            oCancelAnimationFrame ||
-            this._ctTime;
-        }
     },
     _stTime: function(callback){
         var currTime = new Date().getTime();
@@ -542,11 +519,11 @@ var game = {
                 director.mainLoop();
                 if(self._intervalId)
                     cancelAnimationFrame(self._intervalId);
-                self._intervalId = requestAnimFrame(callback);
+                self._intervalId = requestAnimationFrame(callback);
             }
         };
 
-        requestAnimFrame(callback);
+        requestAnimationFrame(callback);
         self._paused = false;
     },
 

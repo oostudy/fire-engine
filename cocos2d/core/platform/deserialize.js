@@ -24,7 +24,6 @@
  ****************************************************************************/
 
 var JS = require('./js');
-var CCObject = require('./CCObject');
 var Attr = require('./attribute');
 
 // HELPERS

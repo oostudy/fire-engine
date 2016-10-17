@@ -27,8 +27,8 @@
  */
 
 if (!(CC_EDITOR && Editor.isMainProcess)) {
-    window.Uint16Array = window.Uint16Array || window.Array;
-    window.Float32Array = window.Float32Array || window.Array;
+    var Uint16Array = Uint16Array || Array;
+    var Float32Array = Float32Array || Array;
 }
 
 cc.math.Matrix3 = function(mat3) {

@@ -104,7 +104,7 @@ function loadDepends (pipeline, item, asset, tdInfo, deferredLoadRawAssetsInRunt
         var item;
         for (var src in items) {
             item = items[src];
-            if (item.uuid && item.content) {
+            if (item.uuid && item.content && typeof item.content === 'object') {
                 item.content._uuid = item.uuid;
             }
         }

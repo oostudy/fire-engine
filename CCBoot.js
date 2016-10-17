@@ -34,7 +34,7 @@ cc._LogInfos = cc._LogInfos || {};
  * @name cc.ENGINE_VERSION
  */
 var engineVersion = '1.3.0-beta.3';
-window['CocosEngine'] = cc.ENGINE_VERSION = engineVersion;
+global['CocosEngine'] = cc.ENGINE_VERSION = engineVersion;
 
 /**
  * drawing primitive of game engine

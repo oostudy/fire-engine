@@ -28,7 +28,7 @@ require('./assets');
 
 if (!CC_EDITOR || !Editor.isMainProcess) {
     if (!CC_JSB) {
-        require('./sprites/CCSpriteFrameCache');
+        // require('./sprites/CCSpriteFrameCache');
     }
 
     require('./CCNode');
