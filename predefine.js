@@ -57,7 +57,7 @@ require('./polyfill/math');
 require('./cocos2d/core/platform/js');
 require('./cocos2d/core/value-types');
 require('./cocos2d/core/utils');
-// require('./cocos2d/core/platform/CCInputManager');
+require('./cocos2d/core/platform/CCInputManager');
 // require('./cocos2d/core/platform/CCInputExtension');
 require('./cocos2d/core/event');
 require('./cocos2d/core/platform/CCSys');
@@ -74,6 +74,7 @@ if (!CC_JSB) {
         require('./cocos2d/core/platform/CCView');
         require('./cocos2d/core/CCActionManager');
         require('./cocos2d/core/CCScheduler');
+        require('./cocos2d/core/event-manager');
         require('./cocos2d/core/renderer');
 
         require('./CCBoot.js');
