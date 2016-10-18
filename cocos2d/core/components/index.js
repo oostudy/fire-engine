@@ -34,9 +34,22 @@ module.exports = [
     require('./CCWidget'),
     require('./CCCanvas'),
     require('./CCAnimation'),
+    require('./CCButton'),
     require('./CCLabel'),
+    // require('./CCProgressBar'),
+    // require('./CCMask'),
+    // require('./CCScrollBar'),
+    // require('./CCScrollView'),
+    // require('./CCPageViewIndicator'),
+    // require('./CCPageView'),
+    // require('./CCSlider'),
     require('./CCLayout'),
+    // require('./CCEditBox'),
+    // require('./CCVideoPlayer'),
+    // require('./CCWebView'),
     // require('./CCSpriteDistortion'),
     require('./CCLabelOutline'),
-    // require('./CCRichText')
+    // require('./CCRichText'),
+    // require('./CCToggleGroup'),
+    // require('./CCToggle')
 ];
